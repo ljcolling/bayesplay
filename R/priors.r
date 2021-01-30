@@ -83,10 +83,37 @@ prior <- function(distribution, ...) {
 
 
 # function that specifies a normal prior
+# working on for ./R/plotting.R
 normal_prior <- function(mean, sd, range) {
   if (missing(mean) | missing(sd)) {
     stop("You must specify `mean` and `sd` for a normal prior", call. = FALSE)
   }
+    raw_func <- eval(parse(
+      text =
+        (paste0(
+          "function(theta) dnorm(x = theta, mean = ",
+          mean, ", sd = ",
+          sd, ")"
+        ))
+    ))
+  # normalise the pior
+  # get the normalising factor
+  if (range[1] != range[2]) {
+    k <- 1 / stats::integrate(
+      f = raw_func,
+      lower = range[1],
+      upper = range[2]
+    )$value
+  } else {
+    # It's a point prior
+    k <- 1
+  }
+
+    func <- eval(parse(
+      text = glue::glue("function(theta)",
+                        " ifelse(in_range(theta, range),",
+                        " dnorm(x = theta, mean = {mean}, sd = {sd}) * {k}, 0)")
+    ))
 
   params <- list(mean = mean, sd = sd, range = range)
 
@@ -94,16 +121,10 @@ normal_prior <- function(mean, sd, range) {
     Class = "prior",
     data = list(parameters = params, distribution = "normal"),
     theta_range = range,
-    func = eval(parse(
-      text =
-        (paste0(
-          "function(theta) dnorm(x = theta, mean = ",
-          mean, ", sd = ",
-          sd, ")"
-        ))
-    )),
     type = "normal",
-    desc = purrr::map(list(params), function(x) paste0(names(x)," : ",x,"\n"))[[1]],
+    func = Vectorize(func),
+    desc = purrr::map(list(params),
+                      function(x) paste0(names(x), " : ", x, "\n"))[[1]],
     dist_type = "continuous",
     plot = list(
       range = c(mean - qnorm(p = 0.9999) * sd, mean + qnorm(p = 0.9999) * sd),
@@ -122,7 +143,7 @@ point_prior <- function(range, point = 0) {
   }
   width <- 4
   range <- c(point - width, point + width)
-  params = list(point = point)
+  params <- list(point = point)
   new(
     Class = "prior",
     data = list(parameters = params, distribution = "point"),
@@ -141,7 +162,8 @@ point_prior <- function(range, point = 0) {
     ),
     parameters = list(point = point),
     function_text = paste0("prior(\"point\", point = ", point, ")"),
-    desc = purrr::map(list(params), function(x) paste0(names(x)," : ",x,"\n"))[[1]]
+    desc = purrr::map(list(params),
+                      function(x) paste0(names(x), " : ", x, "\n"))[[1]]
   )
 }
 
@@ -168,7 +190,8 @@ uniform_prior <- function(min, max, range) {
         ))
     )),
     type = "normal",
-    desc = purrr::map(list(params), function(x) paste0(names(x)," : ",x,"\n"))[[1]],
+    desc = purrr::map(list(params),
+                      function(x) paste0(names(x), " : ", x, "\n"))[[1]],
     dist_type = "continuous",
     plot = list(
       range = c(min * 2, max * 2),
@@ -199,7 +222,7 @@ student_t_prior <- function(mean, sd, df, range) {
       # TODO: REPLACE metRology dependency with local copy
       text =
         (paste0(
-          "function(theta) dt.scaled(x = theta, df = ",
+          "function(theta) dt_scaled(x = theta, df = ",
           df, ", mean = ", mean, ", sd = ", sd, ")"
         ))
     )),
@@ -213,4 +236,7 @@ student_t_prior <- function(mean, sd, df, range) {
     parameters = list(mean = mean, sd = sd),
     function_text = paste0("prior(\"normal\", mean = ", mean, ", sd =", sd, ")")
   )
+}
+
+cauchy_prior <- function(rscale, range) {
 }
