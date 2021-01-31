@@ -194,7 +194,6 @@ uniform_prior <- function(min, max, range) {
                       function(x) paste0(names(x), " : ", x, "\n"))[[1]],
     dist_type = "continuous",
     plot = list(
-      # range = c(min * 2, max * 2), #TODO update range for uniform prior
       range = c(min - abs(min - max), max + abs(min - max)),
       labs = list(x = "\u03F4", y = "P(\u03F4)")
     ),
@@ -220,7 +219,6 @@ student_t_prior <- function(mean, sd, df, range) {
     data = list(mean = mean, sd = sd, df = df, distribution = "student_t"),
     theta_range = range,
     func = eval(parse(
-      # TODO: REPLACE metRology dependency with local copy
       text =
         (paste0(
           "function(theta) dt_scaled(x = theta, df = ",
