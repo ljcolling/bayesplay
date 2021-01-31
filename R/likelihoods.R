@@ -1,12 +1,10 @@
 
 
 
-dt.scaled <- function (x, df, mean = 0, sd = 1, ncp, log = FALSE)
-{
+dt_scaled <- function(x, df, mean = 0, sd = 1, ncp, log = FALSE) {
   if (!log)
-    stats::dt((x - mean)/sd, df, ncp = ncp, log = FALSE)/sd
-  else stats::dt((x - mean)/sd, df, ncp = ncp, log = TRUE) -
-    log(sd)
+    stats::dt((x - mean) / sd, df, ncp = ncp, log = FALSE) / sd
+  else stats::dt((x - mean) / sd, df, ncp = ncp, log = TRUE) - log(sd)
 }
 
 #################################################################
@@ -149,7 +147,7 @@ student_t_likelihood <- function(...) {
     func = eval(parse(
       text =
         (paste0(
-          "function(theta) dt.scaled(x = theta, df = ",
+          "function(theta) dt_scaled(x = theta, df = ",
           df, ", mean = ", mean, ", sd = ", sd, ")"
         ))
     )),
