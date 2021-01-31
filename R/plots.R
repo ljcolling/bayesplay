@@ -16,7 +16,8 @@ plot.bayesplay <- function(x) {
     ggplot2::ggplot() +
       ggplot2::geom_function(
         fun = x@func,
-        colour = "black"
+        colour = "black",
+        na.rm = TRUE
       ) +
       ggplot2::xlim(x@plot$range) +
       ggplot2::labs(x = x@plot$labs$x, y = x@plot$labs$y)

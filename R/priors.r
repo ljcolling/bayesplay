@@ -194,7 +194,8 @@ uniform_prior <- function(min, max, range) {
                       function(x) paste0(names(x), " : ", x, "\n"))[[1]],
     dist_type = "continuous",
     plot = list(
-      range = c(min * 2, max * 2),
+      # range = c(min * 2, max * 2), #TODO update range for uniform prior
+      range = c(min - abs(min - max), max + abs(min - max)),
       labs = list(x = "\u03F4", y = "P(\u03F4)")
     ),
     parameters = list(mean = mean, sd = sd),

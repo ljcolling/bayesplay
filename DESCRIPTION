@@ -1,7 +1,7 @@
 Package: bayesplay
 Type: Package
 Title: The Bayes Factor Playground 
-Version: 0.1.0
+Version: 0.1.1
 Author: Lincoln J Colling
 Maintainer: Lincoln J Colling <lincoln@colling.net.nz>
 Description: This package is for exploring and calculating Bayes factors
