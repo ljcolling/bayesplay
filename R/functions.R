@@ -18,6 +18,94 @@ in_range <- function(x, range) {
 }
 
 
+# function factory for distribution functions
+make_distribution <- function(dist_name, params) {
+
+  g <- glue::glue
+
+  eval2 <- function(x) {
+    eval(parse(text = x))
+  }
+
+# add x = theta if it's missing
+  if ("x" %in% names(params) == FALSE) {
+    params <- c(list(x = "theta"), params)
+  }
+
+# point
+  point <- g("function({params$x})",
+             "ifelse({params$x} == {params$point}",
+             ", 1, 0)")
+
+# normal distribution
+  norm_dist <- g("function({params$x}) ",
+                  "dnorm(x = {params$x},",
+                  " mean = {params$mean},",
+                  " sd = {params$sd})")
+
+# half normal distribution
+  half_norm <- g("function({params$x})",
+                  " ifelse(in_range({params$x},",
+                  "c({params$range[1]},{params$range[2]})),",
+                  " dnorm(x = {params$x},",
+                  " mean = {params$mean},",
+                  " sd = {params$sd}) * {params$k}, 0)")
+
+
+# uniform distribution
+  uni_dist <- g("function({params$x})",
+                 " dunif(x = {params$x},",
+                 " min = {params$min},",
+                 " max = {params$max})")
+
+
+# t distribution
+  t_dist <- g("function({params$x})",
+               " dt_scaled(x = {params$x},",
+               " df = {params$df},",
+               " mean = {params$mean},",
+               " ncp = {params$ncp},",
+               " sd = {params$sd})")
+
+  non_central_t_dist <- g("function({params$x})",
+                          " dt(x = {params$d} * sqrt(params$df + 1),",
+                          " df = {params$df},",
+                          " ncp = {sqrt(params$df + 1)} * {params$x})")
+
+# half t-distribution
+
+  half_t <- g("function({params$x})",
+               " ifelse(in_range({params$x},",
+               "c({params$range[1]},{params$range[2]})),",
+               " dt_scaled(x = {params$x},",
+               " df = {params$df},",
+               " mean = {params$mean},",
+               " ncp = {params$ncp},",
+               " sd = {params$sd}) * {params$k}, 0)")
+
+
+# cauchy distribution
+  cauchy_dist <- g("function({params$x})",
+               " dcauchy(x = {params$x},",
+               " location = {params$location},",
+               " scale = {params$scale})")
+
+# half t-distribution
+
+  half_cauchy <- g("function({params$x})",
+               " ifelse(in_range({params$x},",
+               "c({params$range[1]},{params$range[2]})),",
+               " dcauchy(x = {params$x},",
+               " location = {params$location},",
+               " scale = {params$scale}) * {params$k}, 0)")
+
+
+  return_func <- eval(parse(text = dist_name))
+  return(eval2(return_func))
+}
+
+
+
 #' @importFrom methods new
 #' @importFrom stats qnorm sd integrate
 
@@ -39,27 +127,20 @@ in_range <- function(x, range) {
   prior_func <- prior@func
 
   # normalise the pior
-  if (theta_range[1] != theta_range[2]) {
-    k <- 1 / stats::integrate(
-      f = prior_func,
-      lower = theta_range[1],
-      upper = theta_range[2]
-    )$value
-  } else {
-    # It's a point prior
-    k <- 1
-  }
+  k <- 1 # can delete this
   marginal <- function(theta) {
-    likelihood_func(theta = theta) * (k * prior_func(theta = theta))
+    likelihood_func(theta = theta) * (prior_func(theta = theta))
   }
 
   if (theta_range[1] != theta_range[2]) {
-    alt_val <- stats::integrate(marginal, theta_range[1], theta_range[2])$value # nolint
+    alt_val <- suppressWarnings(stats::integrate(marginal,
+                                                 theta_range[1],
+                                                 theta_range[2])$value) # nolin
   } else {
     alt_val <- marginal(theta_range[[1]])
   }
 
-  alt_func <- marginal
+  # alt_func <- marginal
   data <- list(
     integral = alt_val,
     marginal = marginal,
@@ -100,4 +181,3 @@ in_range <- function(x, range) {
 integral <- function(obj) {
   obj$integral
 }
-

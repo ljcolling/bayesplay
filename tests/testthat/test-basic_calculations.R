@@ -55,4 +55,19 @@ test_that("basic BF calculations", {
 
   testthat::expect_equal(b, 0.97, tolerance = tol, scale = 1,
                          label = "student_t prior (student_t likelihood)")
+
+  data_model <- likelihood(distribution = "noncentral_t", d = 0.56, df = 9)
+
+  h1_model <- prior("cauchy", scale = 1)
+  h0_model <- prior("point", 0)
+  m1 <- integral(data_model * h1_model)
+  m0 <- integral(data_model * h0_model)
+
+  b1 <- m1 / m0
+  b2 <- 0.8322549 # obtained from the BayesFactor package
+
+  testthat::expect_equal(b1, unname(b2),
+                         label = "default bayes t (2)")
+
+
 })

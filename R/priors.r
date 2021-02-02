@@ -88,19 +88,13 @@ normal_prior <- function(mean, sd, range) {
   if (missing(mean) | missing(sd)) {
     stop("You must specify `mean` and `sd` for a normal prior", call. = FALSE)
   }
-    raw_func <- eval(parse(
-      text =
-        (paste0(
-          "function(theta) dnorm(x = theta, mean = ",
-          mean, ", sd = ",
-          sd, ")"
-        ))
-    ))
+
+  func <- make_distribution("norm_dist", list(mean = mean, sd = sd))
   # normalise the pior
   # get the normalising factor
   if (range[1] != range[2]) {
     k <- 1 / stats::integrate(
-      f = raw_func,
+      f = func,
       lower = range[1],
       upper = range[2]
     )$value
@@ -109,11 +103,14 @@ normal_prior <- function(mean, sd, range) {
     k <- 1
   }
 
-    func <- eval(parse(
-      text = glue::glue("function(theta)",
-                        " ifelse(in_range(theta, range),",
-                        " dnorm(x = theta, mean = {mean}, sd = {sd}) * {k}, 0)")
-    ))
+  if (k != 1) {
+    func <- make_distribution("half_norm",
+                              list(range = range,
+                                   mean = mean,
+                                   sd = sd,
+                                   k = k))
+  }
+
 
   params <- list(mean = mean, sd = sd, range = range)
 
@@ -144,16 +141,12 @@ point_prior <- function(range, point = 0) {
   width <- 4
   range <- c(point - width, point + width)
   params <- list(point = point)
+  func <- make_distribution("point", list(point = point))
   new(
     Class = "prior",
     data = list(parameters = params, distribution = "point"),
     theta_range = c(point, point),
-    func = eval(parse(
-      text =
-        (paste0(
-          "function(theta) ifelse(theta == ", point, ", 1, 0)"
-        ))
-    )),
+    func = func,
     type = "point",
     dist_type = "point",
     plot = list(
@@ -175,20 +168,13 @@ uniform_prior <- function(min, max, range) {
   }
 
 
-
+  func <- make_distribution("uni_dist", list(min = min, max = max))
   params <- list(min = min, max = max)
   new(
     Class = "prior",
     data = list(parameters = params, distribution = "uniform"),
     theta_range = range,
-    func = eval(parse(
-      text =
-        (paste0(
-          "function(theta) dunif(x = theta, min = ",
-          min, ", max = ",
-          max, ")"
-        ))
-    )),
+    func = func,
     type = "normal",
     desc = purrr::map(list(params),
                       function(x) paste0(names(x), " : ", x, "\n"))[[1]],
@@ -214,17 +200,36 @@ student_t_prior <- function(mean, sd, df, range) {
   }
 
 
+  func <- make_distribution("t_dist",
+                            list(mean = mean, sd = sd, df = df, ncp = 0))
+  # normalise the pior
+  # get the normalising factor
+  if (range[1] != range[2]) {
+    k <- 1 / stats::integrate(
+      f = func,
+      lower = range[1],
+      upper = range[2]
+    )$value
+  } else {
+    # It's a point prior
+    k <- 1
+  }
+
+  if (k != 1) {
+    func <- make_distribution("half_t",
+                              list(range = range,
+                                   mean = mean,
+                                   sd = sd,
+                                   df = df,
+                                   ncp = 0,
+                                   k = k))
+  }
+
   new(
     Class = "prior",
     data = list(mean = mean, sd = sd, df = df, distribution = "student_t"),
     theta_range = range,
-    func = eval(parse(
-      text =
-        (paste0(
-          "function(theta) dt_scaled(x = theta, df = ",
-          df, ", mean = ", mean, ", sd = ", sd, ")"
-        ))
-    )),
+    func = Vectorize(func),
     type = "normal",
     desc = "",
     dist_type = "continuous",
@@ -237,5 +242,49 @@ student_t_prior <- function(mean, sd, df, range) {
   )
 }
 
-cauchy_prior <- function(rscale, range) {
+cauchy_prior <- function(location = 0, scale, range) {
+  func <- make_distribution("cauchy_dist",
+                            list(location = location, scale = scale))
+  # normalise the pior
+  # get the normalising factor
+  if (range[1] != range[2]) {
+    k <- 1 / stats::integrate(
+      f = func,
+      lower = range[1],
+      upper = range[2]
+    )$value
+  } else {
+    # It's a point prior
+    k <- 1
+  }
+
+  if (k != 1) {
+    func <- make_distribution("half_cauchy",
+                              list(range = range,
+                                   location = location,
+                                   scale = scale,
+                                   k = k))
+  }
+
+  new(
+    Class = "prior",
+    data = list(location = location,
+                scale = scale,
+                distribution = "cauchy",
+                normalizing_constant = k),
+    theta_range = range,
+    func = Vectorize(func),
+    type = "normal",
+    desc = "",
+    dist_type = "continuous",
+    plot = list(
+      range = c(location - qnorm(p = 0.9999) * scale,
+                location + qnorm(p = 0.9999) * scale),
+      labs = list(x = "\u03F4", y = "P(\u03F4)")
+    ),
+    parameters = list(location = location, scale = scale),
+    function_text = paste0("prior(\"cauchy\", location = ",
+                           location, ", scale =",
+                           scale, ")")
+  )
 }

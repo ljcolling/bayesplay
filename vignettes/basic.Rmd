@@ -183,6 +183,38 @@ bf
 
 This gives a Bayes factor of ~`r round(bf,2)`, the same value reported by @dienes2014.
 
+### Example 3
+
+In Example three 
+
+They report a *t* of 2.24, with *df* of 79. To compute the Bayefactor with `bayesplay`, we first convert this *t* value to a standardized effect size *d*. This *t* value equates to a *d* of `r round(2.24 / sqrt(80),5)`. To model the data we use the `noncentral_t` likelihood function with is parametrised in terms of *d* and *df*. We specify a null model using a point prior at 0, and we specify the alternative model using a Cauchy distribution centred at 0 (location parameter) with a scale parameter of 1. 
+
+```{r}
+d = 2.03 / sqrt(80) # convert t to d
+data_model <- likelihood(distribution = "noncentral_t", d, 79)
+h0_mod <- prior(distribution = "point", point = 0)
+h1_mod <- prior(distribution = "cauchy", location = 0, scale = 1)
+
+bf <- integral(data_model * h0_mod) / integral(data_model * h1_mod)
+bf
+```
+
+Performing the calculation as a above yields Bayes factor of ~`r round(bf,2)`, the same value reported by @rouder.
+
+To demonstrate the sensitivity of Bayes factor to prior specification, @morey recompute the Bayes factor for this example using a unit-information (a standard normal) prior for the alternative model. 
+
+```{r}
+d = 2.03 / sqrt(80) # convert t to d
+data_model <- likelihood(distribution = "noncentral_t", d, 79)
+h0_mod <- prior(distribution = "point", point = 0)
+h1_mod <- prior(distribution = "normal", mean = 0, sd = 1)
+
+bf <- integral(data_model * h0_mod) / integral(data_model * h1_mod)
+bf
+
+```
+
+Similarly recomputing our Bayes factor yields a value of ~`r round(bf,2)`, the same value reported @rouder.
 
 
 
