@@ -39,16 +39,16 @@ make_distribution <- function(dist_name, params) {
 
 # normal distribution
   norm_dist <- g("function({params$x}) ",
-                  "dnorm(x = {params$x},",
-                  " mean = {params$mean},",
+                  "dnorm(x = {params$mean},",
+                  " mean = {params$x},",
                   " sd = {params$sd})")
 
 # half normal distribution
   half_norm <- g("function({params$x})",
                   " ifelse(in_range({params$x},",
                   "c({params$range[1]},{params$range[2]})),",
-                  " dnorm(x = {params$x},",
-                  " mean = {params$mean},",
+                  " dnorm(x = {params$mean},",
+                  " mean = {params$x},",
                   " sd = {params$sd}) * {params$k}, 0)")
 
 
@@ -61,10 +61,10 @@ make_distribution <- function(dist_name, params) {
 
 # t distribution
   t_dist <- g("function({params$x})",
-               " dt_scaled(x = {params$x},",
+               " dt_scaled(x = {params$mean},",
                " df = {params$df},",
-               " mean = {params$mean},",
-               " ncp = {params$ncp},",
+               " mean = {params$x},",
+               # " ncp = {params$ncp},",
                " sd = {params$sd})")
 
   non_central_t_dist <- g("function({params$x})",
@@ -72,14 +72,18 @@ make_distribution <- function(dist_name, params) {
                           " df = {params$df},",
                           " ncp = {sqrt(params$df + 1)} * {params$x})")
 
-# half t-distribution
+  non_central_t_dist_t <- g("function({params$x})",
+                          " dt(x = {params$t},",
+                          " df = {params$df},",
+                          " ncp = {params$x})")
+
 
   half_t <- g("function({params$x})",
                " ifelse(in_range({params$x},",
                "c({params$range[1]},{params$range[2]})),",
-               " dt_scaled(x = {params$x},",
+               " dt_scaled(x = {params$mean},",
                " df = {params$df},",
-               " mean = {params$mean},",
+               " mean = {params$x},",
                " ncp = {params$ncp},",
                " sd = {params$sd}) * {params$k}, 0)")
 

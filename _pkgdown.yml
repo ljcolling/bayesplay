@@ -1,5 +1,5 @@
 home:
-  title: An R package for pool-noodle discovery
+  title: An R package for teaching Bayes factors 
   links:
   - text: Browse source code at
     href: https://github.com/ljcolling/bayesplay
