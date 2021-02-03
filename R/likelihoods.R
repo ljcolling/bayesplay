@@ -1,10 +1,18 @@
 
 
 
-dt_scaled <- function(x, df, mean = 0, sd = 1, ncp, log = FALSE) {
-  if (!log)
-    stats::dt((x - mean) / sd, df, ncp = ncp, log = FALSE) / sd
-  else stats::dt((x - mean) / sd, df, ncp = ncp, log = TRUE) - log(sd)
+dt_scaled <- function(x, df, mean = 0, sd = 1, ncp = 0, log = FALSE) {
+  # if (ncp == 0) {
+    if (!log) {
+      return(stats::dt((x - mean) / sd, df, ncp = ncp, log = FALSE) / sd)
+    } else {
+      return(stats::dt((x - mean) / sd, df, ncp = ncp, log = TRUE) - log(sd))
+    }
+
+  # } else {
+  #   return(stats::dt(x = mean, df = df, ncp = sqrt(df + 1) * x))
+  # }
+
 }
 
 #################################################################
@@ -87,20 +95,16 @@ normal_likelihood <- function(mean, sd) { # nolint
   width <- 4 * sd
   range <- c(mean - width, mean + width)
 
+  func <- make_distribution("norm_dist",
+                            list(mean = mean, sd = sd))
+
   new(
     Class = "likelihood",
     data = list(
       likelihood_type = "normal", parameters = params,
       observation = mean
     ),
-    func = eval(parse(
-      text =
-        (paste0(
-          "function(theta) dnorm(x = theta, mean = ",
-          mean, ", sd = ",
-          sd, ")"
-        ))
-    )),
+    func = func,
     marginal = paste0(
       "likelihood(distribution = \"normal\", mean = x, sd = ",
       sd, ")"
@@ -116,16 +120,22 @@ normal_likelihood <- function(mean, sd) { # nolint
 
 
 # function that specifies a student_t likelihood
-student_t_likelihood <- function(...) {
-  parameters <- as.list(match.call(expand.dots = TRUE))
+student_t_likelihood <- function(mean = 0, sd = 1, df = 0) {
 
 
-  # TODO: check parameter names to differentiate between non-central t and scaled and shifted t-distribution
+  # parameters <- rlang::enquos(...)
+  # purrr::is_empty(parameters)
+  # if (purrr::is_empty(parameters)) {
+    # ncp <- 0
+  # } else {
+    # ncp <- " "
+  # }
 
-
-  mean <- parameters$mean
-  sd <- parameters$sd
-  df <- parameters$df
+  if (df == 0) {
+    stop("You must specify a `df` a student_t likelihood",
+      call. = FALSE
+    )
+  }
 
   params <- list(mean = mean, sd = sd, df = df)
   desc <- paste0(
@@ -137,6 +147,9 @@ student_t_likelihood <- function(...) {
   # calculate the plot defaults
   width <- 4 * sd
   range <- c(mean - width, mean + width)
+  func <- make_distribution("t_dist",
+                            list(df = df, mean = mean, sd = sd))
+
 
   new(
     Class = "likelihood",
@@ -144,15 +157,9 @@ student_t_likelihood <- function(...) {
       likelihood_type = "student_t",
       parameters = params, observation = mean
     ),
-    func = eval(parse(
-      text =
-        (paste0(
-          "function(theta) dt_scaled(x = theta, df = ",
-          df, ", mean = ", mean, ", sd = ", sd, ")"
-        ))
-    )),
+    func = func,
     marginal = paste0(
-      "likelihood(distribution = \"normal\", mean = x, sd = ",
+      "likelihood(distribution = \"student_t\", mean = x, sd = ",
       sd, ")"
     ),
     desc = desc,
@@ -163,3 +170,89 @@ student_t_likelihood <- function(...) {
     )
   )
 }
+
+
+noncentral_t_likelihood <- function(d, df) {
+
+
+  if (df == 0) {
+    stop("You must specify a `df` a non-central likelihood",
+      call. = FALSE
+    )
+  }
+
+  params <- list(d = d, df = df)
+  desc <- paste0(
+    "Parameters\nMean: ", params[[1]],
+    "\ndf: ", params[[2]]
+  )
+
+  # calculate the plot defaults
+  width <- 4 
+  range <- c(d - width, d + width)
+  func <- make_distribution("non_central_t_dist",
+    list(df = df, d = d))
+
+
+  new(
+    Class = "likelihood",
+    data = list(
+      likelihood_type = "noncentral_t (d parametrisation)",
+      parameters = params, observation = d
+    ),
+    func = func,
+    marginal = paste0(
+      "likelihood(distribution = \"noncentral_t\", d = x, df = ",
+      df, ")"
+    ),
+    desc = desc,
+    dist_type = "continuous",
+    plot = list(
+      range = range,
+      labs = list(x = "\u03F4", y = "L(\u03F4|x)")
+    )
+  )
+}
+
+
+noncentral_t2_likelihood <- function(t, df) {
+
+  if (df == 0) {
+    stop("You must specify a `df` a non-central likelihood",
+      call. = FALSE
+    )
+  }
+
+  params <- list(t = t, df = df)
+  desc <- paste0(
+    "Parameters\nMean: ", params[[1]],
+    "\ndf: ", params[[2]]
+  )
+
+  # calculate the plot defaults
+  width <- 4 
+  range <- c(t - width, t + width)
+  func <- make_distribution("non_central_t_dist_t",
+    list(df = df, t = t))
+
+
+  new(
+    Class = "likelihood",
+    data = list(
+      likelihood_type = "noncentral_t (t parametrisation)",
+      parameters = params, observation = t
+    ),
+    func = func,
+    marginal = paste0(
+      "likelihood(distribution = \"noncentral_t2\", d = x, df = ",
+      df, ")"
+    ),
+    desc = desc,
+    dist_type = "continuous",
+    plot = list(
+      range = range,
+      labs = list(x = "\u03F4", y = "L(\u03F4|x)")
+    )
+  )
+}
+
