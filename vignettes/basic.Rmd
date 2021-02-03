@@ -192,9 +192,9 @@ In Example three we'll reproduce an example from @rouderbf. @rouderbf specify th
 
 ```{r}
 d = 2.03 / sqrt(80) # convert t to d
-data_model <- likelihood(distribution = "noncentral_t", d, 79)
+data_model <- likelihood(distribution = "noncentral_d", d, 79)
 h0_mod <- prior(distribution = "point", point = 0)
-h1_mod <- prior(distribution = "cauchy", location = 0, scale = 1)
+h1_mod <- prior(distribution = "cauchy",  scale = 1)
 
 bf <- integral(data_model * h0_mod) / integral(data_model * h1_mod)
 bf
