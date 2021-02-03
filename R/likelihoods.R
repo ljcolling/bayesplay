@@ -172,7 +172,7 @@ student_t_likelihood <- function(mean = 0, sd = 1, df = 0) {
 }
 
 
-noncentral_t_likelihood <- function(d, df) {
+noncentral_d_likelihood <- function(d, df) {
 
 
   if (df == 0) {
@@ -215,7 +215,7 @@ noncentral_t_likelihood <- function(d, df) {
 }
 
 
-noncentral_t2_likelihood <- function(t, df) {
+noncentral_t_likelihood <- function(t, df) {
 
   if (df == 0) {
     stop("You must specify a `df` a non-central likelihood",

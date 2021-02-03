@@ -56,7 +56,7 @@ test_that("basic BF calculations", {
   testthat::expect_equal(b, 0.97, tolerance = tol, scale = 1,
                          label = "student_t prior (student_t likelihood)")
 
-  data_model <- likelihood(distribution = "noncentral_t", d = 0.56, df = 9)
+  data_model <- likelihood(distribution = "noncentral_d", d = 0.56, df = 9)
 
   h1_model <- prior("cauchy", scale = 1)
   h0_model <- prior("point", 0)
@@ -71,7 +71,7 @@ test_that("basic BF calculations", {
 
 
 
-  data_model <- likelihood(distribution = "noncentral_t2",
+  data_model <- likelihood(distribution = "noncentral_t",
                            t = 0.56 * sqrt(10), df = 9)
 
   h1_model <- prior("cauchy", scale = 1 * sqrt(10))
