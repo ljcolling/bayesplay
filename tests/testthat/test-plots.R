@@ -1,4 +1,4 @@
-context("Distributions")
+context("Plots")
 test_that("Prior plots", {
 
   # Half normal prior

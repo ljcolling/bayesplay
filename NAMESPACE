@@ -2,6 +2,7 @@
 
 S3method("*",bayesplay)
 S3method(plot,bayesplay)
+export(calc_posterior)
 export(integral)
 export(likelihood)
 export(prior)

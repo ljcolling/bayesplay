@@ -1,3 +1,5 @@
+context("Basic calculations")
+
 test_that("basic BF calculations", {
   tol <- 0.005
   data_model <- likelihood(distribution = "normal", mean = 5, sd = 10)
@@ -74,6 +76,24 @@ test_that("basic BF calculations", {
                          tolerance = tol, scale = 1
   )
 
+# now do it with a one-sided prior
+  data_model <- likelihood(distribution = "noncentral_d", d = d, df = n - 1)
+
+  h1_model <- prior("cauchy", scale = 1, range = c(0, Inf))
+  h0_model <- prior("point", 0)
+  m1 <- integral(data_model * h1_model)
+  m0 <- integral(data_model * h0_model)
+
+  b1 <- m0 / m1
+  b2 <-  0.79745
+
+  testthat::expect_equal(b1, unname(b2),
+                         label = "default bayes t (orginal) one-sided",
+                         tolerance = tol, scale = 1
+  )
+
+
+
 
 
   data_model <- likelihood(distribution = "noncentral_t",
@@ -85,7 +105,7 @@ test_that("basic BF calculations", {
   m0 <- integral(data_model * h0_model)
 
   b1 <- m1 / m0
-
+  b2 <-  1 / 1.557447
   testthat::expect_equal(b1, unname(b2),
                          label = "default bayes t (t version)",
                          tolerance = tol, scale = 1)
