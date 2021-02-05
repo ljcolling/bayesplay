@@ -132,22 +132,25 @@ make_distribution <- function(dist_name, params) {
 
   # normalise the pior
   k <- 1 # can delete this
+
+  posterior_mod <- calc_posterior(likelihood, prior)
   marginal <- function(theta) {
-    likelihood_func(theta = theta) * (prior_func(theta = theta))
-  }
+      likelihood_func(theta = theta) * (prior_func(theta = theta))
+    }
 
-  if (theta_range[1] != theta_range[2]) {
-    alt_val <- suppressWarnings(stats::integrate(marginal,
-                                                 theta_range[1],
-                                                 theta_range[2])$value) # nolin
-  } else {
-    alt_val <- marginal(theta_range[[1]])
-  }
-
+    if (theta_range[1] != theta_range[2]) {
+      alt_val <- suppressWarnings(stats::integrate(marginal,
+                                                   theta_range[1],
+                                                   theta_range[2])$value) # nolin
+    } else {
+      alt_val <- marginal(theta_range[[1]])
+    }
   # alt_func <- marginal
   data <- list(
     integral = alt_val,
-    marginal = marginal,
+    # marginal = marginal,
+    posterior_function = posterior_mod,
+    prediction_function = predict(likelihood, prior),
     prior.normalising.constant = k
   )
 
@@ -185,3 +188,17 @@ make_distribution <- function(dist_name, params) {
 integral <- function(obj) {
   obj$integral
 }
+
+predict <- function(data_model, prior_model) {
+
+  g <- glue::glue
+
+  marginal <- data_model@marginal #nolint
+  marginal_func <- eval(parse(text = g("function(x) {marginal}"))) #nolint
+
+  predictive_func <- function(x) integral(marginal_func(x) * prior_model)
+
+  return(Vectorize(predictive_func))
+
+}
+

@@ -102,7 +102,8 @@ normal_likelihood <- function(mean, sd) { # nolint
     Class = "likelihood",
     data = list(
       likelihood_type = "normal", parameters = params,
-      observation = mean
+      observation = mean,
+      likelihood_function = func
     ),
     func = func,
     marginal = paste0(
@@ -155,12 +156,13 @@ student_t_likelihood <- function(mean = 0, sd = 1, df = 0) {
     Class = "likelihood",
     data = list(
       likelihood_type = "student_t",
-      parameters = params, observation = mean
+      parameters = params, observation = mean,
+      likelihood_function = func
     ),
     func = func,
     marginal = paste0(
       "likelihood(distribution = \"student_t\", mean = x, sd = ",
-      sd, ")"
+      sd, ", df = ", df, ")"
     ),
     desc = desc,
     dist_type = "continuous",
@@ -198,11 +200,12 @@ noncentral_d_likelihood <- function(d, df) {
     Class = "likelihood",
     data = list(
       likelihood_type = "noncentral_t (d parametrisation)",
-      parameters = params, observation = d
+      parameters = params, observation = d,
+      likelihood_function = func
     ),
     func = func,
     marginal = paste0(
-      "likelihood(distribution = \"noncentral_t\", d = x, df = ",
+      "likelihood(distribution = \"noncentral_d\", d = x, df = ",
       df, ")"
     ),
     desc = desc,
@@ -240,11 +243,12 @@ noncentral_t_likelihood <- function(t, df) {
     Class = "likelihood",
     data = list(
       likelihood_type = "noncentral_t (t parametrisation)",
+      likelihood_function = func,
       parameters = params, observation = t
     ),
     func = func,
     marginal = paste0(
-      "likelihood(distribution = \"noncentral_t2\", d = x, df = ",
+      "likelihood(distribution = \"noncentral_t\", t = x, df = ",
       df, ")"
     ),
     desc = desc,

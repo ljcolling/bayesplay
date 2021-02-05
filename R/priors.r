@@ -116,7 +116,8 @@ normal_prior <- function(mean, sd, range) {
 
   new(
     Class = "prior",
-    data = list(parameters = params, distribution = "normal"),
+    data = list(parameters = params, distribution = "normal",
+                prior_function = Vectorize(func)),
     theta_range = range,
     type = "normal",
     func = Vectorize(func),
@@ -144,7 +145,8 @@ point_prior <- function(range, point = 0) {
   func <- make_distribution("point", list(point = point))
   new(
     Class = "prior",
-    data = list(parameters = params, distribution = "point"),
+    data = list(parameters = params, distribution = "point",
+                prior_function = func),
     theta_range = c(point, point),
     func = func,
     type = "point",
@@ -172,7 +174,8 @@ uniform_prior <- function(min, max, range) {
   params <- list(min = min, max = max)
   new(
     Class = "prior",
-    data = list(parameters = params, distribution = "uniform"),
+    data = list(parameters = params, distribution = "uniform",
+                prior_function = func),
     theta_range = range,
     func = func,
     type = "normal",
@@ -227,7 +230,8 @@ student_t_prior <- function(mean, sd, df, range) {
 
   new(
     Class = "prior",
-    data = list(mean = mean, sd = sd, df = df, distribution = "student_t"),
+    data = list(mean = mean, sd = sd, df = df, distribution = "student_t",
+                prior_function = Vectorize(func)),
     theta_range = range,
     func = Vectorize(func),
     type = "normal",
@@ -271,7 +275,8 @@ cauchy_prior <- function(location = 0, scale, range) {
     data = list(location = location,
                 scale = scale,
                 distribution = "cauchy",
-                normalizing_constant = k),
+                normalizing_constant = k,
+                prior_function = Vectorize(func)),
     theta_range = range,
     func = Vectorize(func),
     type = "normal",
