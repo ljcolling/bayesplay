@@ -1,4 +1,10 @@
 
+range_as_text <- function(range) {
+  paste0(range[1]," to ", range[2])
+}
+
+
+
 #################################################################
 ##                 DEFINITIONS OF THE PRIORS                   ##
 #################################################################
@@ -114,15 +120,24 @@ normal_prior <- function(mean, sd, range) {
 
   params <- list(mean = mean, sd = sd, range = range)
 
+  desc <- paste0(
+  "Object of class prior\n",
+  "Distribution family: normal\n\n",
+  "Parameters\n",
+  "Mean: ", params$mean, "\n",
+  "SD: ", params$sd, "\n",
+  "Range: ", range_as_text(range)
+  )
+
   new(
     Class = "prior",
-    data = list(parameters = params, distribution = "normal",
-                prior_function = Vectorize(func)),
+    data = list(family = "normal",
+                params = as.data.frame(params),
+                fun = Vectorize(func)),
     theta_range = range,
     type = "normal",
     func = Vectorize(func),
-    desc = purrr::map(list(params),
-                      function(x) paste0(names(x), " : ", x, "\n"))[[1]],
+    desc = desc,
     dist_type = "continuous",
     plot = list(
       range = c(mean - qnorm(p = 0.9999) * sd, mean + qnorm(p = 0.9999) * sd),
@@ -143,10 +158,18 @@ point_prior <- function(range, point = 0) {
   range <- c(point - width, point + width)
   params <- list(point = point)
   func <- make_distribution("point", list(point = point))
+  
+  desc <- paste0(
+  "Object of class prior\n",
+  "Distribution family: point\n\n",
+  "Parameters\n",
+  "point: ", params$point
+  )
   new(
     Class = "prior",
-    data = list(parameters = params, distribution = "point",
-                prior_function = func),
+    data = list(family = "point",
+                params = as.data.frame(params),
+                fun = Vectorize(func)),
     theta_range = c(point, point),
     func = func,
     type = "point",
@@ -157,8 +180,7 @@ point_prior <- function(range, point = 0) {
     ),
     parameters = list(point = point),
     function_text = paste0("prior(\"point\", point = ", point, ")"),
-    desc = purrr::map(list(params),
-                      function(x) paste0(names(x), " : ", x, "\n"))[[1]]
+    desc = desc
   )
 }
 
@@ -172,15 +194,23 @@ uniform_prior <- function(min, max, range) {
 
   func <- make_distribution("uni_dist", list(min = min, max = max))
   params <- list(min = min, max = max)
+
+  desc <- paste0(
+  "Object of class prior\n",
+  "Distribution family: uniform\n\n",
+  "Parameters\n",
+  "Min: ", params$min,"\n",
+  "Max: ", params$max
+  )
   new(
     Class = "prior",
-    data = list(parameters = params, distribution = "uniform",
-                prior_function = func),
+    data = list(family = "uniform",
+                params = as.data.frame(params),
+                fun = Vectorize(func)),
     theta_range = range,
     func = func,
     type = "normal",
-    desc = purrr::map(list(params),
-                      function(x) paste0(names(x), " : ", x, "\n"))[[1]],
+    desc = desc,
     dist_type = "continuous",
     plot = list(
       range = c(min - abs(min - max), max + abs(min - max)),
@@ -228,14 +258,27 @@ student_t_prior <- function(mean, sd, df, range) {
                                    k = k))
   }
 
+  desc <- paste0(
+  "Object of class prior\n",
+  "Distribution family: student t\n\n",
+  "Parameters\n",
+  "Mean: ", mean,"\n",
+  "SD: ", sd,"\n",
+  "DF: ", df,"\n",
+  "Range: ", range_as_text(range)
+  )
+
+
+  params <- list(mean = mean, sd = sd, df = df)
   new(
     Class = "prior",
-    data = list(mean = mean, sd = sd, df = df, distribution = "student_t",
-                prior_function = Vectorize(func)),
+    data = list(family = "student t",
+                params = as.data.frame(params),
+                fun = Vectorize(func)),
     theta_range = range,
     func = Vectorize(func),
     type = "normal",
-    desc = "",
+    desc = desc,
     dist_type = "continuous",
     plot = list(
       range = c(mean - qnorm(p = 0.9999) * sd, mean + qnorm(p = 0.9999) * sd),
@@ -270,17 +313,26 @@ cauchy_prior <- function(location = 0, scale, range) {
                                    k = k))
   }
 
+  desc <- paste0(
+  "Object of class prior\n",
+  "Distribution family: cauchy\n\n",
+  "Parameters\n",
+  "Location: ", location, "\n",
+  "Scale: ", scale, "\n",
+  "Range: ", range_as_text(range)
+  )
+
+  params <- list(location = location, scale = scale, range = range)
+
   new(
     Class = "prior",
-    data = list(location = location,
-                scale = scale,
-                distribution = "cauchy",
-                normalizing_constant = k,
-                prior_function = Vectorize(func)),
+    data = list(family = "cauchy",
+                params = as.data.frame(params),
+                fun = Vectorize(func)),
     theta_range = range,
     func = Vectorize(func),
     type = "normal",
-    desc = "",
+    desc = desc,
     dist_type = "continuous",
     plot = list(
       range = c(location - qnorm(p = 0.9999) * scale,

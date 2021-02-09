@@ -58,36 +58,6 @@ setMethod("names",
 )
 
 
-
-#' Summary for an object of class \code{likelihood}
-#' @noRd
-#' @export
-setMethod(
-  "show",
-  "likelihood",
-  function(object) {
-    cat("Object of class", class(object), "\n")
-    cat("Likelihood type:", object@data$likelihood_type, "\n")
-    cat(object@desc, "\n")
-  }
-)
-
-
-#' Summary for an object of class \code{prior}
-#' @noRd
-#' @export
-setMethod(
-  "show",
-  "prior",
-  function(object) {
-    cat("Object of class", class(object), "\n")
-    cat("Prior type:", object@data$distribution, "\n")
-    cat(paste0(object@desc, collapse = ""))
-  }
-)
-
-
-
 #' Get names of the data slot of an object of class \code{predictive}
 #' @usage \\method{names}{predictive}(object, ...)
 #' @noRd
