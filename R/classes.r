@@ -46,3 +46,15 @@ predictive_class <- setClass(
     prior_obj = "prior"
   )
 )
+
+#' Summary for an object of class \code{predictive}
+#' @noRd
+#' @export
+setMethod(
+  "show",
+  "bayesplay",
+  function(object) {
+    cat(object@desc, "\n")
+  }
+)
+

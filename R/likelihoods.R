@@ -1,6 +1,4 @@
 
-
-
 dt_scaled <- function(x, df, mean = 0, sd = 1, ncp = 0, log = FALSE) {
   # if (ncp == 0) {
     if (!log) {
@@ -8,11 +6,6 @@ dt_scaled <- function(x, df, mean = 0, sd = 1, ncp = 0, log = FALSE) {
     } else {
       return(stats::dt((x - mean) / sd, df, ncp = ncp, log = TRUE) - log(sd))
     }
-
-  # } else {
-  #   return(stats::dt(x = mean, df = df, ncp = sqrt(df + 1) * x))
-  # }
-
 }
 
 #################################################################
@@ -86,10 +79,19 @@ normal_likelihood <- function(mean, sd) { # nolint
 
 
   params <- list(mean = mean, sd = sd)
+
   desc <- paste0(
-    "Parameters\nMean: ", params[[1]],
-    "\nSD: ", params[[2]]
+  "Object of class likelihood\n",
+  "Distribution family: normal\n\n",
+  "Parameters\n",
+  "Mean: ", params$mean, "\n",
+  "SD: ", params$sd
   )
+
+  # desc <- paste0(
+    # "Parameters\nMean: ", params[[1]],
+    # "\nSD: ", params[[2]]
+  # )
 
   # calculate the plot defaults
   width <- 4 * sd
@@ -101,9 +103,9 @@ normal_likelihood <- function(mean, sd) { # nolint
   new(
     Class = "likelihood",
     data = list(
-      likelihood_type = "normal", parameters = params,
-      observation = mean,
-      likelihood_function = func
+      family = "normal",
+      parameters = as.data.frame(params),
+      fun = func
     ),
     func = func,
     marginal = paste0(
@@ -140,10 +142,14 @@ student_t_likelihood <- function(mean = 0, sd = 1, df = 0) {
 
   params <- list(mean = mean, sd = sd, df = df)
   desc <- paste0(
-    "Parameters\nMean: ", params[[1]],
-    "\nSD: ", params[[2]],
-    "\ndf: ", params[[3]]
+  "Object of class likelihood\n",
+  "Distribution family: student t\n\n",
+  "Parameters\n",
+  "Mean: ", params$mean, "\n",
+  "SD: ", params$sd, "\n",
+  "DF:", params$df
   )
+
 
   # calculate the plot defaults
   width <- 4 * sd
@@ -155,9 +161,9 @@ student_t_likelihood <- function(mean = 0, sd = 1, df = 0) {
   new(
     Class = "likelihood",
     data = list(
-      likelihood_type = "student_t",
-      parameters = params, observation = mean,
-      likelihood_function = func
+      family = "student_t",
+      parameters = as.data.frame(params),
+      fun = func
     ),
     func = func,
     marginal = paste0(
@@ -185,8 +191,11 @@ noncentral_d_likelihood <- function(d, df) {
 
   params <- list(d = d, df = df)
   desc <- paste0(
-    "Parameters\nMean: ", params[[1]],
-    "\ndf: ", params[[2]]
+  "Object of class likelihood\n",
+  "Distribution family: non-central t (d scaled)\n\n",
+  "Parameters\n",
+  "d: ", params$d, "\n",
+  "DF:", params$df
   )
 
   # calculate the plot defaults
@@ -199,9 +208,9 @@ noncentral_d_likelihood <- function(d, df) {
   new(
     Class = "likelihood",
     data = list(
-      likelihood_type = "noncentral_t (d parametrisation)",
-      parameters = params, observation = d,
-      likelihood_function = func
+      family = "noncentral_d",
+      parameters = as.data.frame(params),
+      fun = func
     ),
     func = func,
     marginal = paste0(
@@ -228,8 +237,11 @@ noncentral_t_likelihood <- function(t, df) {
 
   params <- list(t = t, df = df)
   desc <- paste0(
-    "Parameters\nMean: ", params[[1]],
-    "\ndf: ", params[[2]]
+  "Object of class likelihood\n",
+  "Distribution family: non-central t (t scaled)\n\n",
+  "Parameters\n",
+  "d: ", params$t, "\n",
+  "DF:", params$df
   )
 
   # calculate the plot defaults
@@ -242,9 +254,9 @@ noncentral_t_likelihood <- function(t, df) {
   new(
     Class = "likelihood",
     data = list(
-      likelihood_type = "noncentral_t (t parametrisation)",
-      likelihood_function = func,
-      parameters = params, observation = t
+      family = "noncentral_t",
+      parameters = as.data.frame(params),
+      fun = func
     ),
     func = func,
     marginal = paste0(

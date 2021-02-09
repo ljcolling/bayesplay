@@ -9,7 +9,7 @@ test_that("posterior", {
   h0 <- integral(likelihood_obj * prior("point", 0))
 
   bf <- h1 / h0
-  sd <- prior_obj$prior_function(0) / posterior_obj$posterior_function(0)
+  sd <- prior_obj$fun(0) / posterior_obj$posterior_function(0)
   testthat::expect_equal(bf, sd, label = "BF does match Savage-Dicky Ratio")
 
 
