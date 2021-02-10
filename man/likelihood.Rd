@@ -45,7 +45,6 @@ parameters must be set
 
 When \code{distribution} is set to \code{student_t} then the following
 parameters may be set
-\subsection{scaled and shifted t-distribution}{
 \itemize{
 \item \code{mean} mean of the scaled and shifted t likelihood
 \item \code{sd} standard deviation of the scaled and shifted t likelihood
@@ -53,32 +52,24 @@ parameters may be set
 }
 }
 
-}
-
 \subsection{noncentral_t distribution}{
 
 When \code{distribution} is set to \code{noncentral_t} then the following
 parameters may be set
-\subsection{noncentral t distribution (t scaled)}{
 \itemize{
 \item \code{t} the t value of the data
 \item \code{df} degrees of freedom
 }
 }
 
-}
-
 \subsection{noncentral_d distribution}{
 
 When \code{distribution} is set to \code{noncentral_d} then the following
 parameters may be set
-\subsection{noncentral t distribution (d scaled)}{
 \itemize{
 \item \code{d} the d (mean / sd) value of the data
 \item \code{df} degrees of freedom
 }
-}
-
 }
 }
 \examples{
@@ -89,9 +80,9 @@ likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
 likelihood(distribution = "student_t", mean = 5.5, sd = 32.35, df = 10)
 
 # specify non-central t likelihood (t scaled)
-# likelihood(distribution = "noncentral_t", t = 10, df = 10)
+likelihood(distribution = "noncentral_t", t = 10, df = 10)
 
 # specify non-central t likelihood (d scaled)
-# likelihood(distribution = "noncentral_d", d = 10, df = 10)
+likelihood(distribution = "noncentral_d", d = 10, df = 10)
 
 }
