@@ -238,7 +238,7 @@ bfsay = function(BF) {
 #' @noRd
 #' @export
 setMethod(
-  "show",
+  "summary",
   "bf",
   function(object) {
     cat("Bayes factor\n")
@@ -252,9 +252,19 @@ setMethod(
 #' @export
 setMethod(
   "show",
+  "bf",
+  function(object) {
+    cat(object, "\n")
+  }
+)
+
+#' Summary for an object of class \code{bf}
+#' @noRd
+#' @export
+setMethod(
+  "show",
   "auc",
   function(object) {
-    cat("Area under curve\n")
     cat(object, "\n")
   }
 )
