@@ -209,6 +209,30 @@ integral <- function(obj) {
   new("bf", unclass(e1) / unclass(e2))
 }
 
+bfsay = function(BF) {
+  BF <- unclass(BF)
+  if(BF < 1){
+    BF_base <- BF
+    BF <- 1 / BF
+  } else {
+    BF_base <- BF
+  }
+
+  ev_level <- dplyr::case_when(BF == 1 ~ "No evidence",
+                              BF > 1 & BF <= 3 ~ "Anecdotal evidence",
+                              BF > 3 & BF <= 10 ~ "Moderate evidence",
+                              BF > 10 & BF <= 30 ~ "Strong evidence",
+                              BF > 30 & BF <= 100 ~ "Very strong evidence",
+                              BF > 100 ~ "Extreme evidence")
+
+
+ cat("Using the levels from  Wagenmakers et al (2017)\n")
+ cat("A BF of ", round(BF_base,4), " indicates:\n")
+ cat(ev_level)
+
+
+
+}
 
 #' Summary for an object of class \code{bf}
 #' @noRd
@@ -218,7 +242,8 @@ setMethod(
   "bf",
   function(object) {
     cat("Bayes factor\n")
-    cat(object, "\n")
+    cat(bfsay(object), "\n")
+    # cat(object, "\n")
   }
 )
 
