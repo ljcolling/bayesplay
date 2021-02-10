@@ -22,7 +22,9 @@ dt_scaled <- function(x, df, mean = 0, sd = 1, ncp = 0, log = FALSE) {
 #' ## Available distributions
 #' The following distributions can be used for the likelihood
 #' * \code{normal} a normal distribution
-#' * \code{student_t} a scaled and shifted or non-central t-distribution
+#' * \code{student_t} a scaled and shifted t-distribution
+#' * \code{noncentral_t} a noncentral t distribution (t scaled)
+#' * \code{noncentral_d} a noncentral t distribution (d scaled)
 #' The parameters that need to be specified will be dependent on the
 #' distribution
 #' ## normal distribution
@@ -39,9 +41,20 @@ dt_scaled <- function(x, df, mean = 0, sd = 1, ncp = 0, log = FALSE) {
 #' * \code{sd} standard deviation of the scaled and shifted t likelihood
 #' * \code{df} degrees of freedom
 #'
-#' ### non-central t-distribution
-#' * \code{ncp} The non-centrality parameter
-#' * \code{df} The degrees of freedom
+#' ## noncentral_t distribution
+#' When \code{distribution} is set to \code{noncentral_t} then the following
+#' parameters may be set
+#' ### noncentral t distribution (t scaled)
+#' * \code{t} the t value of the data
+#' * \code{df} degrees of freedom
+#'
+#' ## noncentral_d distribution
+#' When \code{distribution} is set to \code{noncentral_d} then the following
+#' parameters may be set
+#' ### noncentral t distribution (d scaled)
+#' * \code{d} the d (mean / sd) value of the data
+#' * \code{df} degrees of freedom
+#'
 #' @md
 #' @return an object of class \code{likelihood}
 #' @export
@@ -53,8 +66,12 @@ dt_scaled <- function(x, df, mean = 0, sd = 1, ncp = 0, log = FALSE) {
 #' # specify a scaled and shifted t likelihood
 #' likelihood(distribution = "student_t", mean = 5.5, sd = 32.35, df = 10)
 #'
-#' # specify non-central t likelihood (no currently implemented)
-#' # likelihood(distribution = "student_t", ncp = 10, df = 10)
+#' # specify non-central t likelihood (t scaled)
+#' # likelihood(distribution = "noncentral_t", t = 10, df = 10)
+#'
+#' # specify non-central t likelihood (d scaled)
+#' # likelihood(distribution = "noncentral_d", d = 10, df = 10)
+#'
 likelihood <- function(distribution, ...) {
   parameters <- as.list(match.call(expand.dots = TRUE))
 

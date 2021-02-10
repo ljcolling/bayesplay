@@ -23,7 +23,9 @@ Specify a likelihood
 The following distributions can be used for the likelihood
 \itemize{
 \item \code{normal} a normal distribution
-\item \code{student_t} a scaled and shifted or non-central t-distribution
+\item \code{student_t} a scaled and shifted t-distribution
+\item \code{noncentral_t} a noncentral t distribution (t scaled)
+\item \code{noncentral_d} a noncentral t distribution (d scaled)
 The parameters that need to be specified will be dependent on the
 distribution
 }
@@ -51,10 +53,29 @@ parameters may be set
 }
 }
 
-\subsection{non-central t-distribution}{
+}
+
+\subsection{noncentral_t distribution}{
+
+When \code{distribution} is set to \code{noncentral_t} then the following
+parameters may be set
+\subsection{noncentral t distribution (t scaled)}{
 \itemize{
-\item \code{ncp} The non-centrality parameter
-\item \code{df} The degrees of freedom
+\item \code{t} the t value of the data
+\item \code{df} degrees of freedom
+}
+}
+
+}
+
+\subsection{noncentral_d distribution}{
+
+When \code{distribution} is set to \code{noncentral_d} then the following
+parameters may be set
+\subsection{noncentral t distribution (d scaled)}{
+\itemize{
+\item \code{d} the d (mean / sd) value of the data
+\item \code{df} degrees of freedom
 }
 }
 
@@ -67,6 +88,10 @@ likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
 # specify a scaled and shifted t likelihood
 likelihood(distribution = "student_t", mean = 5.5, sd = 32.35, df = 10)
 
-# specify non-central t likelihood (no currently implemented)
-# likelihood(distribution = "student_t", ncp = 10, df = 10)
+# specify non-central t likelihood (t scaled)
+# likelihood(distribution = "noncentral_t", t = 10, df = 10)
+
+# specify non-central t likelihood (d scaled)
+# likelihood(distribution = "noncentral_d", d = 10, df = 10)
+
 }
