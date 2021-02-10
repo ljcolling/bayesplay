@@ -178,8 +178,14 @@ make_distribution <- function(dist_name, params) {
 
 #' @S3Method
 `/.predictive` <- function(e1, e2) {
-  e1@data$integral / e2@data$integral
+  bf <-e1@data$integral / e2@data$integral
+  return(bf)
 }
+
+setOldClass("numeric")
+
+auc <- setClass("auc", contains = "numeric")
+bf <- setClass("bf", contains = "numeric")
 
 
 
@@ -195,8 +201,38 @@ make_distribution <- function(dist_name, params) {
 #'
 #' @examples
 integral <- function(obj) {
-  obj$integral
+  new("auc", obj$integral)
 }
+
+#' @export
+`/.auc` <- function(e1, e2) {
+  new("bf", unclass(e1) / unclass(e2))
+}
+
+
+#' Summary for an object of class \code{bf}
+#' @noRd
+#' @export
+setMethod(
+  "show",
+  "bf",
+  function(object) {
+    cat("Bayes factor\n")
+    cat(object, "\n")
+  }
+)
+
+#' Summary for an object of class \code{bf}
+#' @noRd
+#' @export
+setMethod(
+  "show",
+  "auc",
+  function(object) {
+    cat("Area under curve\n")
+    cat(object, "\n")
+  }
+)
 
 predict <- function(data_model, prior_model) {
 
