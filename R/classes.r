@@ -32,7 +32,6 @@ likelihood_class <- setClass(
 
 
 
-setClassUnion("bayesplay", c("likelihood", "prior"))
 
 predictive_class <- setClass(
   Class = "predictive",
@@ -47,7 +46,9 @@ predictive_class <- setClass(
   )
 )
 
-#' Summary for an object of class \code{predictive}
+setClassUnion("bayesplay", c("likelihood", "prior", "predictive"))
+
+#' Summary for an object of class \code{bayesplay}
 #' @noRd
 #' @export
 setMethod(
@@ -58,3 +59,26 @@ setMethod(
   }
 )
 
+#' Access values stored in the data slot of an object of class \code{bayesplay}
+#' @usage \\method{$}{bayesplay}(object, ...)
+#' @noRd
+#' @export
+setMethod("$",
+  signature = "bayesplay",
+  function(x, name) {
+    returnval <- x@data[[name]]
+    return(returnval)
+  }
+)
+
+
+#' Get names of the data slot of an object of class \code{bayesplay}
+#' @usage \\method{names}{bayesplay}(object, ...)
+#' @noRd
+#' @export
+setMethod("names",
+  signature = "bayesplay",
+  function(x) {
+    return(names(x@data))
+  }
+)
