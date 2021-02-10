@@ -37,6 +37,7 @@ predictive_class <- setClass(
   Class = "predictive",
   slots = list(
     data = "list",
+    desc = "character",
     K = "numeric",
     lik = "function",
     prior = "function",

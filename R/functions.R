@@ -154,8 +154,17 @@ make_distribution <- function(dist_name, params) {
     prior.normalising.constant = k
   )
 
+  desc <- paste0(
+  "Object of class predictive\n",
+  "Likelihood family: ", likelihood$family, "\n",
+  "Prior family: ", prior$family, "\n\n",
+  "Area under curve: ", round(data$integral,4)
+  )
+
+    
   new(
     Class = "predictive",
+    desc = desc,
     data = data,
     K = k,
     lik = likelihood_func,
