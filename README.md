@@ -44,8 +44,7 @@ priors
 
 2.  Uniform distribution (`uniform`)
 
-3.  *t* distribution, including scaled and shifted and non-central *t*
-    distributions (`student_t`)
+3.  Scaled and shifted *t* distribution (`student_t`)
 
 4.  Cauchy distributions (`cauchy`)
 
@@ -53,10 +52,13 @@ priors
 
 1.  Normal distribution (`normal`)
 
-2.  *t* distribution, including scaled and shifted and non-central *t*
-    distributions (`student_t`)
+2.  *t* distribution, including scaled and shifted *t* distribution
+    (`student_t`) and *d* scaled (`noncentral_d`) and *t* scaled
+    (`noncentral_t`) noncentral *t* distributions
 
 ## Worked examples
 
 For worked examples of the basic usage see [basic
-usage](https://git.colling.net.nz/bayesplay/articles/basic.html).
+usage](https://git.colling.net.nz/bayesplay/articles/basic.html). Or for
+basic plot functionality see [basic
+plotting](https://git.colling.net.nz/bayesplay/articles/plots.html)

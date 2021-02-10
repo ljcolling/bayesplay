@@ -36,7 +36,6 @@ dt_scaled <- function(x, df, mean = 0, sd = 1, ncp = 0, log = FALSE) {
 #' ## student_t distribution
 #' When \code{distribution} is set to \code{student_t} then the following
 #' parameters may be set
-#' ### scaled and shifted t-distribution
 #' * \code{mean} mean of the scaled and shifted t likelihood
 #' * \code{sd} standard deviation of the scaled and shifted t likelihood
 #' * \code{df} degrees of freedom
@@ -44,14 +43,12 @@ dt_scaled <- function(x, df, mean = 0, sd = 1, ncp = 0, log = FALSE) {
 #' ## noncentral_t distribution
 #' When \code{distribution} is set to \code{noncentral_t} then the following
 #' parameters may be set
-#' ### noncentral t distribution (t scaled)
 #' * \code{t} the t value of the data
 #' * \code{df} degrees of freedom
 #'
 #' ## noncentral_d distribution
 #' When \code{distribution} is set to \code{noncentral_d} then the following
 #' parameters may be set
-#' ### noncentral t distribution (d scaled)
 #' * \code{d} the d (mean / sd) value of the data
 #' * \code{df} degrees of freedom
 #'
@@ -67,10 +64,10 @@ dt_scaled <- function(x, df, mean = 0, sd = 1, ncp = 0, log = FALSE) {
 #' likelihood(distribution = "student_t", mean = 5.5, sd = 32.35, df = 10)
 #'
 #' # specify non-central t likelihood (t scaled)
-#' # likelihood(distribution = "noncentral_t", t = 10, df = 10)
+#' likelihood(distribution = "noncentral_t", t = 10, df = 10)
 #'
 #' # specify non-central t likelihood (d scaled)
-#' # likelihood(distribution = "noncentral_d", d = 10, df = 10)
+#' likelihood(distribution = "noncentral_d", d = 10, df = 10)
 #'
 likelihood <- function(distribution, ...) {
   parameters <- as.list(match.call(expand.dots = TRUE))
