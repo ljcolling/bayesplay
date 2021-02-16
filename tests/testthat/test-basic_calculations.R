@@ -9,7 +9,9 @@ test_that("basic BF calculations", {
   m0 <- integral(data_model * h0_model)
   b <- m1 / m0
 
-  testthat::expect_equal(b, 0.89, tolerance = tol, scale = 1,
+  testthat::expect_equal(unclass(b),
+                         unclass(0.89),
+                         tolerance = tol, scale = 1,
                         label = "uniform prior")
 
   data_model <- likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
@@ -20,7 +22,9 @@ test_that("basic BF calculations", {
   m0 <- integral(data_model * h0_model)
   b <- m1 / m0
 
-  testthat::expect_equal(b, 0.97, tolerance = tol, scale = 1,
+  testthat::expect_equal(unclass(b),
+                         unclass(0.97),
+                         tolerance = tol, scale = 1,
                          label = "normal prior")
 
 
@@ -33,7 +37,9 @@ test_that("basic BF calculations", {
   m0 <- integral(data_model * h0_model)
   b <- m1 / m0
 
-  testthat::expect_equal(b, 0.83, tolerance = tol, scale = 1,
+  testthat::expect_equal(unclass(b),
+                         unclass(0.83),
+                         tolerance = tol, scale = 1,
                          label = "half-normal prior")
 
 
@@ -44,7 +50,9 @@ test_that("basic BF calculations", {
   m0 <- integral(data_model * h0_model)
   b <- m1 / m0
 
-  testthat::expect_equal(b, 0.25, tolerance = tol, scale = 1,
+  testthat::expect_equal(unclass(b),
+                         unclass(0.25),
+                         tolerance = tol, scale = 1,
                          label = "normal prior")
 
 
@@ -55,7 +63,9 @@ test_that("basic BF calculations", {
   m0 <- integral(data_model * h0_model)
   b <- m1 / m0
 
-  testthat::expect_equal(b, 0.97, tolerance = tol, scale = 1,
+  testthat::expect_equal(unclass(b),
+                         unclass(0.97),
+                         tolerance = tol, scale = 1,
                          label = "student_t prior (student_t likelihood)")
 
   t <- 2.03
@@ -71,7 +81,8 @@ test_that("basic BF calculations", {
   b1 <- m1 / m0
   b2 <-  1 / 1.557447
 
-  testthat::expect_equal(b1, unname(b2),
+  testthat::expect_equal(unclass(b1),
+                         unclass(unname(b2)),
                          label = "default bayes t (orginal)",
                          tolerance = tol, scale = 1
   )
@@ -87,7 +98,8 @@ test_that("basic BF calculations", {
   b1 <- m0 / m1
   b2 <-  0.79745
 
-  testthat::expect_equal(b1, unname(b2),
+  testthat::expect_equal(unclass(b1),
+                         unclass(unname(b2)),
                          label = "default bayes t (orginal) one-sided",
                          tolerance = tol, scale = 1
   )
@@ -106,7 +118,8 @@ test_that("basic BF calculations", {
 
   b1 <- m1 / m0
   b2 <-  1 / 1.557447
-  testthat::expect_equal(b1, unname(b2),
+  testthat::expect_equal(unclass(b1),
+                         unclass(unname(b2)),
                          label = "default bayes t (t version)",
                          tolerance = tol, scale = 1)
 

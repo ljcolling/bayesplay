@@ -1,5 +1,6 @@
-
-prior_class <- setClass(
+#' @noRd
+#' @export
+prior <- setClass(
   Class = "prior",
   slots = list(
     data = "list",
@@ -15,7 +16,9 @@ prior_class <- setClass(
 )
 
 
-likelihood_class <- setClass(
+#' @noRd
+#' @export
+likelihood <- setClass(
   Class = "likelihood",
   slots = list(
     data = "list",
@@ -32,11 +35,13 @@ likelihood_class <- setClass(
 
 
 
-
-predictive_class <- setClass(
+#' @noRd
+#' @export
+predictive <- setClass(
   Class = "predictive",
   slots = list(
     data = "list",
+    desc = "character",
     K = "numeric",
     lik = "function",
     prior = "function",
@@ -45,6 +50,7 @@ predictive_class <- setClass(
     prior_obj = "prior"
   )
 )
+
 
 setClassUnion("bayesplay", c("likelihood", "prior", "predictive"))
 
@@ -82,3 +88,5 @@ setMethod("names",
     return(names(x@data))
   }
 )
+
+

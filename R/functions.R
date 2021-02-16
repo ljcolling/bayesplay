@@ -141,7 +141,7 @@ make_distribution <- function(dist_name, params) {
     if (theta_range[1] != theta_range[2]) {
       alt_val <- suppressWarnings(stats::integrate(marginal,
                                                    theta_range[1],
-                                                   theta_range[2])$value) # nolin
+                                                   theta_range[2])$value)
     } else {
       alt_val <- marginal(theta_range[[1]])
     }
@@ -154,8 +154,17 @@ make_distribution <- function(dist_name, params) {
     prior.normalising.constant = k
   )
 
+  desc <- paste0(
+  "Object of class predictive\n",
+  "Likelihood family: ", likelihood$family, "\n",
+  "Prior family: ", prior$family, "\n\n",
+  "Area under curve: ", round(data$integral,4)
+  )
+
+    
   new(
     Class = "predictive",
+    desc = desc,
     data = data,
     K = k,
     lik = likelihood_func,
@@ -169,8 +178,14 @@ make_distribution <- function(dist_name, params) {
 
 #' @S3Method
 `/.predictive` <- function(e1, e2) {
-  e1@data$integral / e2@data$integral
+  bf <-e1@data$integral / e2@data$integral
+  return(bf)
 }
+
+setOldClass("numeric")
+
+auc <- setClass("auc", contains = "numeric")
+bf <- setClass("bf", contains = "numeric")
 
 
 
@@ -186,11 +201,75 @@ make_distribution <- function(dist_name, params) {
 #'
 #' @examples
 integral <- function(obj) {
-  obj$integral
+  new("auc", obj$integral)
 }
 
-predict <- function(data_model, prior_model) {
+#' @export
+`/.auc` <- function(e1, e2) {
+  new("bf", unclass(e1) / unclass(e2))
+}
 
+bfsay = function(BF) {
+  BF <- unclass(BF)
+  if(BF < 1){
+    BF_base <- BF
+    BF <- 1 / BF
+  } else {
+    BF_base <- BF
+  }
+
+  ev_level <- dplyr::case_when(BF == 1 ~ "No evidence",
+                              BF > 1 & BF <= 3 ~ "Anecdotal evidence",
+                              BF > 3 & BF <= 10 ~ "Moderate evidence",
+                              BF > 10 & BF <= 30 ~ "Strong evidence",
+                              BF > 30 & BF <= 100 ~ "Very strong evidence",
+                              BF > 100 ~ "Extreme evidence")
+
+
+ cat("Using the levels from  Wagenmakers et al (2017)\n")
+ cat("A BF of ", round(BF_base,4), " indicates:\n")
+ cat(ev_level)
+
+
+
+}
+
+#' Summary for an object of class \code{bf}
+#' @noRd
+#' @export
+setMethod(
+  "summary",
+  "bf",
+  function(object) {
+    cat("Bayes factor\n")
+    cat(bfsay(object), "\n")
+    # cat(object, "\n")
+  }
+)
+
+#' Summary for an object of class \code{bf}
+#' @noRd
+#' @export
+setMethod(
+  "show",
+  "bf",
+  function(object) {
+    cat(object, "\n")
+  }
+)
+
+#' Summary for an object of class \code{bf}
+#' @noRd
+#' @export
+setMethod(
+  "show",
+  "auc",
+  function(object) {
+    cat(object, "\n")
+  }
+)
+
+predict <- function(data_model, prior_model) {
   g <- glue::glue
 
   marginal <- data_model@marginal #nolint
@@ -202,3 +281,21 @@ predict <- function(data_model, prior_model) {
 
 }
 
+
+#' @export
+calc_posterior <- function(likelihood, prior) {
+  make_posterior <- function(likelihood, prior, theta) {
+
+    k <- bayesplay::integral(likelihood * prior)
+
+    prior_func <- prior@func
+    likelihood_func <- likelihood@func
+
+    (prior_func(theta) *
+     likelihood_func(theta)) / k
+  }
+
+  purrr::partial(make_posterior,
+                 likelihood = likelihood,
+                 prior = prior)
+}
