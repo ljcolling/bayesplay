@@ -1,6 +1,7 @@
 #' @include classes.R functions.R likelihoods.R functions.R priors.R
 #' @export
-plot.bayesplay <- function(x, n = 101) {
+plot.bayesplay <- function(x, ...) {
+  n <- 101
   if(("dist_type" %in% slotNames(x)) == TRUE) {
     if (x@dist_type == "point") {
       data <- data.frame(x = x@parameters$point, y = 1)
@@ -19,7 +20,7 @@ plot.bayesplay <- function(x, n = 101) {
           fun = x@func,
           colour = "black",
           na.rm = TRUE,
-          n = 101
+          n = n
         ) +
         ggplot2::xlim(x@plot$range) +
         ggplot2::labs(x = x@plot$labs$x, y = x@plot$labs$y)
@@ -33,7 +34,7 @@ plot.bayesplay <- function(x, n = 101) {
         fun = func,
         colour = "black",
         na.rm = TRUE,
-        n = 101
+        n = n
       ) +
       # ggplot2::xlim(x@plot$range) +
       NULL
