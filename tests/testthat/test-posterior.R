@@ -14,7 +14,7 @@ test_that("posterior", {
                         unclass(sd),
                         label = "BF does match Savage-Dicky Ratio")
 
-  
+
   testthat::expect_equal(unclass(h1),
                         unclass(posterior_obj$prediction_function(0.7)),
                         label = "Prediction function")
@@ -48,4 +48,4 @@ test_that("posterior", {
   testthat::expect_gt(unclass(half),
                         unclass(full),
                         label = "Prediction function")
-})
+ })

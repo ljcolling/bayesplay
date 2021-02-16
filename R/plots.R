@@ -1,7 +1,6 @@
- 
+#' @include classes.R functions.R likelihoods.R functions.R priors.R
 #' @export
 plot.bayesplay <- function(x, n = 101) {
-
   if(("dist_type" %in% slotNames(x)) == TRUE) {
     if (x@dist_type == "point") {
       data <- data.frame(x = x@parameters$point, y = 1)
@@ -24,11 +23,11 @@ plot.bayesplay <- function(x, n = 101) {
         ) +
         ggplot2::xlim(x@plot$range) +
         ggplot2::labs(x = x@plot$labs$x, y = x@plot$labs$y)
-    } else if (x@dist_type == "discrete") {
+    } else if (x@dist_type == "discrete") { }
 
-    }
-   } else {
+    } else {
     func <- x$prediction_function
+    # func <- x$posterior_function
     ggplot2::ggplot() +
       ggplot2::geom_function(
         fun = func,
@@ -36,26 +35,10 @@ plot.bayesplay <- function(x, n = 101) {
         na.rm = TRUE,
         n = 101
       ) +
-      ggplot2::xlim(x@likelihood_obj@plot$range) +
+      # ggplot2::xlim(x@plot$range) +
       NULL
 
   }
 }
 
 
-#' @export
-calc_posterior <- function(likelihood, prior) {
-  make_posterior <- function(likelihood, prior, theta) {
-
-    k <- bayesplay::integral(likelihood * prior)
-
-    prior_func <- prior@func
-    likelihood_func <- likelihood@func
-    (prior_func(theta) *
-     likelihood_func(theta)) / k
-  }
-
-  purrr::partial(make_posterior,
-                 likelihood = likelihood,
-                 prior = prior)
-}

@@ -141,7 +141,7 @@ make_distribution <- function(dist_name, params) {
     if (theta_range[1] != theta_range[2]) {
       alt_val <- suppressWarnings(stats::integrate(marginal,
                                                    theta_range[1],
-                                                   theta_range[2])$value) # nolin
+                                                   theta_range[2])$value)
     } else {
       alt_val <- marginal(theta_range[[1]])
     }
@@ -270,7 +270,6 @@ setMethod(
 )
 
 predict <- function(data_model, prior_model) {
-
   g <- glue::glue
 
   marginal <- data_model@marginal #nolint
@@ -282,3 +281,21 @@ predict <- function(data_model, prior_model) {
 
 }
 
+
+#' @export
+calc_posterior <- function(likelihood, prior) {
+  make_posterior <- function(likelihood, prior, theta) {
+
+    k <- bayesplay::integral(likelihood * prior)
+
+    prior_func <- prior@func
+    likelihood_func <- likelihood@func
+
+    (prior_func(theta) *
+     likelihood_func(theta)) / k
+  }
+
+  purrr::partial(make_posterior,
+                 likelihood = likelihood,
+                 prior = prior)
+}
