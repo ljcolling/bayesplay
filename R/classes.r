@@ -1,6 +1,6 @@
 #' @noRd
 #' @export
-pror <- setClass(
+prior <- setClass(
   Class = "prior",
   slots = list(
     data = "list",
