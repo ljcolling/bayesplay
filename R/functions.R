@@ -114,7 +114,6 @@ make_distribution <- function(dist_name, params) {
 #' @importFrom stats qnorm sd integrate
 
 
-#' @S3Method
 #' @export
 `*.bayesplay` <- function(e1, e2) {
   if (class(e1) == "likelihood") {
@@ -161,7 +160,7 @@ make_distribution <- function(dist_name, params) {
   "Area under curve: ", round(data$integral,4)
   )
 
-    
+
   new(
     Class = "predictive",
     desc = desc,
@@ -176,7 +175,6 @@ make_distribution <- function(dist_name, params) {
 }
 # }
 
-#' @S3Method
 `/.predictive` <- function(e1, e2) {
   bf <-e1@data$integral / e2@data$integral
   return(bf)
