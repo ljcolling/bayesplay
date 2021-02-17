@@ -126,6 +126,7 @@ normal_likelihood <- function(mean, sd) { # nolint
       "likelihood(distribution = \"normal\", mean = x, sd = ",
       sd, ")"
     ),
+    observation = params$mean,
     desc = desc,
     dist_type = "continuous",
     plot = list(
@@ -184,6 +185,7 @@ student_t_likelihood <- function(mean = 0, sd = 1, df = 0) {
       "likelihood(distribution = \"student_t\", mean = x, sd = ",
       sd, ", df = ", df, ")"
     ),
+    observation = params$mean,
     desc = desc,
     dist_type = "continuous",
     plot = list(
@@ -231,6 +233,7 @@ noncentral_d_likelihood <- function(d, df) {
       "likelihood(distribution = \"noncentral_d\", d = x, df = ",
       df, ")"
     ),
+    observation = params$d,
     desc = desc,
     dist_type = "continuous",
     plot = list(
@@ -277,6 +280,7 @@ noncentral_t_likelihood <- function(t, df) {
       "likelihood(distribution = \"noncentral_t\", t = x, df = ",
       df, ")"
     ),
+      observation = params$t,
     desc = desc,
     dist_type = "continuous",
     plot = list(

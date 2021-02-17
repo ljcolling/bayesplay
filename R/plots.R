@@ -1,6 +1,6 @@
 #' @export
-plot.bayesplay <- function(x, ...) {
-  n <- 101
+plot.bayesplay <- function(x, n = 101, ...) {
+
   if(("dist_type" %in% slotNames(x)) == TRUE) {
     if (x@dist_type == "point") {
       data <- data.frame(x = x@parameters$point, y = 1)
@@ -27,6 +27,7 @@ plot.bayesplay <- function(x, ...) {
 
     } else {
     func <- x$prediction_function
+    plot_range <- x@likelihood_obj@plot$range
     # func <- x$posterior_function
     ggplot2::ggplot() +
       ggplot2::geom_function(
@@ -35,10 +36,50 @@ plot.bayesplay <- function(x, ...) {
         na.rm = TRUE,
         n = n
       ) +
-      # ggplot2::xlim(x@plot$range) +
+      ggplot2::xlim(plot_range) +
       NULL
 
   }
 }
 
 
+
+#' @export
+visual_compare <- function(model1, model2, n = 101) {
+
+    model1_name <- paste0(substitute(model1))
+    model2_name <- paste0(substitute(model2))
+
+    model1_func <- model1$prediction_function
+
+    model2_func <- model2$prediction_function
+    plot_range <- model1@likelihood_obj@plot$range
+
+    likelihood_obj <- model1@likelihood_obj
+
+   observation <- likelihood_obj@observation
+
+    observation_df <- data.frame(x = c(observation, observation),
+                                 y = c(model1_func(observation),
+                                       model2_func(observation)),
+                                 color = c(model1_name, model2_name))
+    ggplot2::ggplot() +
+      ggplot2::geom_function(
+        fun = model1_func,
+        ggplot2::aes(colour = model1_name),
+        na.rm = TRUE,
+        n = n
+      ) +
+      ggplot2::geom_function(
+        fun = model2_func,
+        ggplot2::aes(colour = model2_name),
+        na.rm = TRUE,
+        n = n
+      ) +
+      ggplot2::geom_point(data = observation_df,
+      ggplot2::aes(x = x, y = y, color = color)) +
+      ggplot2::scale_color_manual(values = c("red", "black"), name = "Models") +
+      ggplot2::xlim(plot_range) +
+      NULL
+
+}

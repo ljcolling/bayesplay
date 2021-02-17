@@ -25,6 +25,7 @@ likelihood <- setClass(
     # theta_range = "",
     func = "function",
     desc = "character",
+    observation = "numeric",
     # type = "character",
     dist_type = "character",
     plot = "list",
