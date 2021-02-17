@@ -24,3 +24,10 @@ Imports:
     purrr,
     methods,
     rlang   
+Collate: 
+    'classes.r'
+    'functions.R'
+    'likelihoods.R'
+    'priors.R'
+    'classes.R'
+    'plots.R'
