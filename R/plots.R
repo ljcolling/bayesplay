@@ -1,4 +1,3 @@
-#' @include classes.R
 #' @export
 plot.bayesplay <- function(x, ...) {
   n <- 101
