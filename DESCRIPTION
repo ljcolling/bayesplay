@@ -25,9 +25,8 @@ Imports:
     methods,
     rlang   
 Collate: 
-    'classes.r'
+    'classes.R'
     'functions.R'
     'likelihoods.R'
-    'priors.R'
-    'classes.R'
     'plots.R'
+    'priors.R'

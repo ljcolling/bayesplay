@@ -1,4 +1,4 @@
-#' @include classes.R functions.R likelihoods.R functions.R priors.R
+#' @include classes.R
 #' @export
 plot.bayesplay <- function(x, ...) {
   n <- 101
