@@ -290,3 +290,44 @@ noncentral_t_likelihood <- function(t, df) {
   )
 }
 
+
+binomial_likelihood <- function(successes, trials) {
+
+
+  params <- list(successes = successes, trials = trials)
+  desc <- paste0(
+  "Object of class likelihood\n",
+  "Distribution family: binomial\n\n",
+  "Parameters\n",
+  "successes: ", params$successes, "\n",
+  "trials: ", params$trials
+  )
+
+  # calculate the plot defaults
+  range <- c(0, 1)
+  func <- make_distribution("binom_dist",
+    list(successes = successes, trials = trials))
+
+
+  new(
+    Class = "likelihood",
+    data = list(
+      family = "binomial",
+      parameters = as.data.frame(params),
+      fun = func
+    ),
+    func = func,
+    marginal = paste0(
+      "likelihood(distribution = \"binomial\", prob = x, trials = ",
+      trials, ", successes = ", successes, ")"
+    ),
+      observation = params$t,
+    desc = desc,
+    dist_type = "discrete",
+    plot = list(
+      range = range,
+      labs = list(x = "\u03F4", y = "L(\u03F4|x)")
+    )
+  )
+}
+
