@@ -12,7 +12,10 @@ plot.bayesplay <- function(x, n = 101, ...) {
                                              ymax = y,
                                              ymin = 0)) +
         ggplot2::xlim(x@plot$range) +
-        ggplot2::labs(x = x@plot$labs$x, y = x@plot$labs$y)
+        ggplot2::labs(x = x@plot$labs$x, y = x@plot$labs$y) +
+        ggplot2::theme_minimal(base_size = 16) +
+        NULL
+
       } else if (x@dist_type == "continuous") {
       ggplot2::ggplot() +
         ggplot2::geom_function(
@@ -22,7 +25,10 @@ plot.bayesplay <- function(x, n = 101, ...) {
           n = n
         ) +
         ggplot2::xlim(x@plot$range) +
-        ggplot2::labs(x = x@plot$labs$x, y = x@plot$labs$y)
+        ggplot2::labs(x = x@plot$labs$x, y = x@plot$labs$y) + 
+        ggplot2::theme_minimal(base_size = 16) +
+        NULL
+
     } else if (x@dist_type == "discrete") {
       func <- x@func
       df <- data.frame(x = seq(0, x@data$parameters$trials) / 
@@ -32,7 +38,9 @@ plot.bayesplay <- function(x, n = 101, ...) {
         ggplot2::geom_point() +
         ggplot2::geom_line() +
         ggplot2::xlim(x@plot$range) +
-        ggplot2::labs(x = x@plot$labs$x, y = x@plot$labs$y)
+        ggplot2::labs(x = x@plot$labs$x, y = x@plot$labs$y) +
+        ggplot2::theme_minimal(base_size = 16) +
+        NULL
     }
 
     } else {
@@ -50,6 +58,7 @@ plot.bayesplay <- function(x, n = 101, ...) {
       ) +
       ggplot2::labs(x = x@prior_obj@plot$labs$x, y = NULL) +
       ggplot2::xlim(plot_range) +
+      ggplot2::theme_minimal(base_size = 16) +
       NULL
 
   }

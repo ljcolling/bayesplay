@@ -424,7 +424,9 @@ plot_posterior <- function(x) {
         fun = x$posterior_function
         ) +
     ggplot2::xlim(x@prior_obj@plot$range) +
-    ggplot2::labs(x = "\u03F4", y = "P(\u03F4|x)")
+    ggplot2::labs(x = "\u03F4", y = "P(\u03F4|x)") +
+    ggplot2::theme_minimal(base_size = 16) +
+    NULL
 
 }
 
@@ -444,8 +446,9 @@ pp_plot <- function(x) {
         ) +
     ggplot2::xlim(x@prior_obj@plot$range) +
     ggplot2::labs(x = "\u03F4", y = "P") +
-    ggplot2::scale_colour_manual(c("red" = "prior", "blue" = "posterior"))
-
+    ggplot2::scale_colour_manual(c("red" = "prior", "blue" = "posterior")) +
+    ggplot2::theme_minimal(base_size = 16) +
+    NULL
 }
 
 
