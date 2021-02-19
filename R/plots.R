@@ -103,6 +103,8 @@ visual_compare <- function(model1, model2, n = 101) {
       ggplot2::aes(x = x, y = y, color = color)) +
       ggplot2::scale_color_manual(values = c("red", "black"), name = "Models") +
       ggplot2::xlim(plot_range) +
+      ggplot2::labs(x = "Observation", y = "Prediction") +
+      ggplot2::theme_minimal(base_size = 16) +
       NULL
 
 }
@@ -135,6 +137,8 @@ plot_predictions <- function(model, n = 101) {
       ggplot2::geom_point(data = observation_df,
       ggplot2::aes(x = x, y = y)) +
       ggplot2::xlim(plot_range) +
+      ggplot2::labs(x = "Observation", y = "Prediction") +
+      ggplot2::theme_minimal(base_size = 16) +
       NULL
 
 }
