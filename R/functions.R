@@ -71,7 +71,6 @@ make_distribution <- function(dist_name, params) {
                " dt_scaled(x = {params$mean},",
                " df = {params$df},",
                " mean = {params$x},",
-               # " ncp = {params$ncp},",
                " sd = {params$sd})")
 
   non_central_t_dist <- g("function({params$x})",
@@ -102,7 +101,6 @@ make_distribution <- function(dist_name, params) {
                " scale = {params$scale})")
 
 # half t-distribution
-
   half_cauchy <- g("function({params$x})",
                " ifelse(in_range({params$x},",
                "c({params$range[1]},{params$range[2]})),",
@@ -137,7 +135,12 @@ make_distribution <- function(dist_name, params) {
     prior <- e1
   }
 
-  theta_range <- prior@theta_range
+  if (likelihood$family == "binomial") {
+    theta_range <- c(0, 1)
+  } else {
+    theta_range <- prior@theta_range
+  }
+
 
   likelihood_func <- likelihood@func
   prior_func <- prior@func
@@ -214,7 +217,7 @@ bf <- setClass("bf", contains = "numeric")
 #'
 #' @examples
 integral <- function(obj) {
-  if(class(obj) == "predictive"){
+  if (class(obj) == "predictive") {
     return(new("auc", obj$integral))
   } else if (class(obj) == "likelihood") {
     return(stats::integrate(obj$fun, -Inf, Inf)$value)
@@ -378,14 +381,14 @@ mean_ci <- function(x, group_var, measure_var) {
 
 }
 
-#' @export
-integral <- function(obj) {
-  if(class(obj) == "predictive"){
-    return(new("auc", obj$integral))
-  } else if (class(obj) == "likelihood") {
-    return(stats::integrate(obj$fun, -Inf, Inf)$value)
-  }
-}
+' @export
+# integral <- function(obj) {
+  # if(class(obj) == "predictive"){
+    # return(new("auc", obj$integral))
+  # } else if (class(obj) == "likelihood") {
+    # return(stats::integrate(obj$fun, -Inf, Inf)$value)
+  # }
+# }
 
 
 #' @export

@@ -89,5 +89,3 @@ setMethod("names",
     return(names(x@data))
   }
 )
-
-
