@@ -23,6 +23,8 @@ You can install the development version from
 
     # install.packages("devtools")
     devtools::install_github("ljcolling/bayesplay")
+    # or install the development branch with
+    # devtools::install_github("ljcolling/bayesplay@devel")
 
 ## Basic usage
 
