@@ -207,7 +207,7 @@ uniform_prior <- function(min, max, range) {
     data = list(family = "uniform",
                 params = as.data.frame(params),
                 fun = Vectorize(func)),
-    theta_range = range,
+    theta_range = c(min, max),
     func = func,
     type = "normal",
     desc = desc,
@@ -345,3 +345,44 @@ cauchy_prior <- function(location = 0, scale, range) {
                            scale, ")")
   )
 }
+
+# function that specifies a beta prior
+beta_prior <- function(alpha, beta, range) {
+  range <- c(0, 1)
+  if (missing(alpha) | missing(beta)) {
+    stop("You must specify `alpha` and `beta` for a beta  prior", call. = FALSE)
+  }
+
+
+  func <- make_distribution("beta_dist", list(alpha = alpha, beta = beta))
+  params <- list(alpha = alpha, beta = beta)
+
+  desc <- paste0(
+  "Object of class prior\n",
+  "Distribution family: beta\n\n",
+  "Parameters\n",
+  "Alpha: ", params$alpha,"\n",
+  "Beta: ", params$alpha
+  )
+  new(
+    Class = "prior",
+    data = list(family = "Beta",
+                params = as.data.frame(params),
+                fun = Vectorize(func)),
+    theta_range = range,
+    func = func,
+    type = "normal",
+    desc = desc,
+    dist_type = "continuous",
+    plot = list(
+      range = c(0, 1),
+      labs = list(x = "\u03F4", y = "P(\u03F4)")
+    ),
+    parameters = list(alpha = alpha, beta = beta),
+    function_text = paste0(
+      "prior(\"beta\", alpha = ",
+      alpha, ", beta =",beta, ")"
+    )
+  )
+}
+
