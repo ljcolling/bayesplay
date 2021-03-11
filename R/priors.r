@@ -207,7 +207,7 @@ uniform_prior <- function(min, max, range) {
     data = list(family = "uniform",
                 params = as.data.frame(params),
                 fun = Vectorize(func)),
-    theta_range = range,
+    theta_range = c(min, max),
     func = func,
     type = "normal",
     desc = desc,

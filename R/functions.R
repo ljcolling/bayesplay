@@ -45,11 +45,16 @@ make_distribution <- function(dist_name, params) {
 
 
   # binomial distribution
+  # could add an ifelse in here?
+  # binom_dist <- g("function({params$x})",
+                  # " ifelse({params$x} > 1 || {params$x} < 0, 0, dbinom(x = {params$successes},",
+                  # " size = {params$trials},",
+                  # " prob = {params$x}))")
+
   binom_dist <- g("function({params$x})",
                   " dbinom(x = {params$successes},",
                   " size = {params$trials},",
                   " prob = {params$x})")
-
 # half normal distribution
   half_norm <- g("function({params$x})",
                   " ifelse(in_range({params$x},",
@@ -135,11 +140,11 @@ make_distribution <- function(dist_name, params) {
     prior <- e1
   }
 
-  if (likelihood$family == "binomial") {
-    theta_range <- c(0, 1)
-  } else {
+  # if (likelihood$family == "binomial") {
+    # theta_range <- c(0, 1)
+  # } else {
     theta_range <- prior@theta_range
-  }
+  # }
 
 
   likelihood_func <- likelihood@func
@@ -329,7 +334,7 @@ calc_marginal <- function(likelihood, prior) {
     likelihood_func <- likelihood@func
 
     (prior_func(theta) *
-     likelihood_func(theta)) 
+     likelihood_func(theta))
   }
 
   purrr::partial(make_marginal,
@@ -348,47 +353,14 @@ sd_ratio <- function(x, theta) {
 }
 
 
-# functions that need tidying 
 #' @export
-rnorm <- function(n, mean, sd) {
-    as.numeric(mean + sd * scale(stats::rnorm(n)))
+integral <- function(obj) {
+  if(class(obj) == "predictive"){
+    return(new("auc", obj$integral))
+  } else if (class(obj) == "likelihood") {
+    return(stats::integrate(obj$fun, -Inf, Inf)$value)
+  }
 }
-
-#' @export
-rbvn <- function (n, m1, s1, m2, s2, rho) {
-     X1 <- rnorm(n, m1, s1)
-     X2 <- rnorm(n, m2 + (s2 / s1) * rho *
-           (X1 - m1), sqrt((1 - rho^2) * s2^2))
-     data.frame(V1 = X1, V2 = X2)
-}
-
-#' @export
-se <- function(x, na.rm = TRUE) {
-
-    sd <- stats::sd(x, na.rm = na.rm)
-    n <- length(x)
-    sd / sqrt(n)
-}
-
-
-#' @export
-mean_ci <- function(x, group_var, measure_var) {
-
-    g <- rlang::enexpr(group_var)
-    m <- rlang::enexpr(measure_var)
-    grouped <- dplyr::group_by(x, !!g)
-    dplyr::summarise(grouped, mean = mean(!!m), ci = 1.96 * se(!!m))
-
-}
-
-' @export
-# integral <- function(obj) {
-  # if(class(obj) == "predictive"){
-    # return(new("auc", obj$integral))
-  # } else if (class(obj) == "likelihood") {
-    # return(stats::integrate(obj$fun, -Inf, Inf)$value)
-  # }
-# }
 
 
 #' @export
