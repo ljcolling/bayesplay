@@ -123,4 +123,44 @@ test_that("basic BF calculations", {
                          label = "default bayes t (t version)",
                          tolerance = tol, scale = 1)
 
+
+
+  data_model <- likelihood(distribution = "binomial", 3, 12)
+  alt_prior <- prior(distribution = "beta", alpha = 1, beta = 2)
+  null_prior <- prior(distribution = "point", point = 0.5)
+  m1 <- data_model * alt_prior
+  m0 <- data_model * null_prior
+  b1 <- integral(m1) / integral(m0)
+  b2 <- 1 /  0.4887695
+  testthat::expect_equal(unclass(b1),
+                         unclass(unname(b2)),
+                         label = "binomial likelihood, beta prior",
+                         tolerance = tol, scale = 1)
+
+
+  data_model <- likelihood(distribution = "binomial", 3, 12)
+  alt_prior <- prior(distribution = "uniform", min = 0, max = 1)
+  null_prior <- prior(distribution = "point", point = 0.5)
+  m1 <- data_model * alt_prior
+  m0 <- data_model * null_prior
+  b1 <- integral(m1) / integral(m0)
+  b2 <- 1 /  0.6982422
+  testthat::expect_equal(unclass(b1),
+                         unclass(unname(b2)),
+                         label = "binomial likelihood, uniform prior",
+                         tolerance = tol, scale = 1)
+
+
+  data_model <- likelihood(distribution = "binomial", 3, 12)
+  alt_prior <- prior(distribution = "beta", 1, 1)
+  null_prior <- prior(distribution = "point", point = 0.5)
+  m1 <- data_model * alt_prior
+  m0 <- data_model * null_prior
+  b1 <- integral(m1) / integral(m0)
+  b2 <- 1 /  0.6982422
+  testthat::expect_equal(unclass(b1),
+                         unclass(unname(b2)),
+                         label = "binomial likelihood, beta uniform",
+                         tolerance = tol, scale = 1)
+
 })
