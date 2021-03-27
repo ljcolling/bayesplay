@@ -325,7 +325,6 @@ calc_posterior <- function(likelihood, prior) {
 }
 
 
-#' @export
 calc_marginal <- function(likelihood, prior) {
   make_marginal <- function(likelihood, prior, theta) {
 
@@ -344,10 +343,10 @@ calc_marginal <- function(likelihood, prior) {
 
 
 #' @export
-sd_ratio <- function(x, theta) {
+sd_ratio <- function(posterior, theta) {
 
-    bf <- x@prior_obj$fun(theta) /
-        x$posterior_function(theta)
+    bf <- posterior@prior_obj$fun(theta) /
+        posterior$posterior_function(theta)
 
     new("bf", bf)
 }
@@ -400,30 +399,7 @@ plot_posterior <- function(x) {
         ) +
     ggplot2::xlim(x@prior_obj@plot$range) +
     ggplot2::labs(x = "\u03F4", y = "P(\u03F4|x)") +
-    ggplot2::theme_minimal(base_size = 16) +
+    # ggplot2::theme_minimal(base_size = 16) +
     NULL
 
 }
-
-
-
-#' @export
-pp_plot <- function(x) {
-
-    ggplot2::ggplot() +
-        ggplot2::geom_function(
-        fun = x$posterior_function,
-        color = "blue"
-        ) +
-        ggplot2::geom_function(
-        fun = x@prior_obj$fun,
-        color = "red"
-        ) +
-    ggplot2::xlim(x@prior_obj@plot$range) +
-    ggplot2::labs(x = "\u03F4", y = "P") +
-    ggplot2::scale_colour_manual(c("red" = "prior", "blue" = "posterior")) +
-    ggplot2::theme_minimal(base_size = 16) +
-    NULL
-}
-
-

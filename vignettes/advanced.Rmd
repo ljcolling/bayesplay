@@ -1,0 +1,289 @@
+---
+title: "Advanced usage"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Advanced usage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+```{r setup}
+library(bayesplay)
+```
+
+## Computing posteriors
+
+The `bayesplay` package also includes functionality for computing basic posteriors. 
+
+### Calculating posteriors for a normal likelihood
+
+To calculate a posterior, two things are needed: 
+
+1. A **prior**, that assigns probabilities to parameter values. This prior can be thought of as beliefs one holds about parameters values before the data have been seen. 
+
+2. A **likelihood**, that provides **evidence**, obtained from the data, for different parameter values. 
+
+From these two ingredients it is possible to calculate a **posterior**, that represents our new beliefs about parameter values after the **evidence** from the data has been taken into account. 
+
+First, we’ll define a prior:
+
+```{r}
+prior_model <- prior(distribution = "normal", mean = 0, sd = 13.3, range = c(0, Inf))
+plot(prior_model)
+```
+
+Next, we’ll define the likelihood:
+
+```{r}
+data_model <- likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
+plot(data_model)
+```
+
+To calculate the posterior, we first multiple the **prior** by the **likelihood**. That is, we *weight* the **evidence** for each parameter value (obtained from the data and represented by the likelihood) by the our **prior**. 
+
+```{r}
+#TODO: Change plot style
+weighted_likelihood <- data_model * prior_model
+plot(weighted_likelihood)
+```
+
+```{r}
+plot(weighted_likelihood, type = "posterior")
+```
+
+
+The result of this calculation, while proportional to the posterior is itself, not a posterior distribution. In the final step is normalising by a constant so that the area under the curve is equal to 1. 
+
+The `bayesplay` package provides a helper function, `pp_plot()`, for plotting the prior together with the posterior. The input to the `pp_plot()` function is the object that is produced by multiplying the prior and the likelihood.
+
+```{r}
+#posterior_dist <- bayesplay:::posterior(likelihood = data_model, prior = #prior_model)
+```
+
+```{r}
+plot(data_model * prior_model, type = "pp")
+```
+
+
+```{r}
+posterior <- data_model * prior_model
+```
+
+```{r}
+prior_model$fun(0) / posterior$posterior_function(0)
+```
+
+
+
+With a prior and a posterior in hand we can examine the density of both distributions at various values of the parameter. For example, we might examine the density of the prior and posterior distributions at the value 0. The ratio of these two values (known as the Savage-Dicky density ratio) represents the change in our belief about the proposition that $\theta$ = 0. We can do this with the `sd_ratio()` function from the `bayesplay` package. The inputs to this function are the posterior and the value at which to evaluate the two densities.
+
+
+```{r}
+sd_ratio(posterior, 0)
+```
+
+```{r}
+summary(sd_ratio(posterior, 0))
+```
+
+```{r}
+prior_model <- prior(distribution = "normal", mean = 40, sd = 13.3)
+data_model <- likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
+posterior1 <- prior_model * data_model
+prior_model$fun(0) / posterior1$posterior_function(0)
+plot(posterior1, type = "pp")
+```
+
+```{r}
+prior_model <- prior(distribution = "normal", mean = 0, sd = 200)
+data_model <- likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
+posterior2 <- prior_model * data_model
+prior_model$fun(0) / posterior2$posterior_function(0)
+plot(posterior2, type = "pp")
+```
+
+```{r}
+prior_model <- prior(distribution = "normal", mean = 0, sd = 13.3)
+data_model <- likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
+posterior3 <- prior_model * data_model
+prior_model$fun(0) / posterior3$posterior_function(0)
+
+plot(posterior3, type = "pp")
+```
+
+```{r}
+prior_model <- prior(distribution = "normal", mean = 5.5, sd = 13.3)
+data_model <- likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
+posterior4 <- prior_model * data_model
+prior_model$fun(0) / posterior4$posterior_function(0)
+plot(posterior3, type = "pp")
+```
+
+Something here about choosing a prior:
+- We want a prior that allows us to learn from the data. 
+
+```{r}
+require(ggplot2)
+ggplot() + 
+  geom_function(fun = posterior1$posterior_function, colour = "blue") +
+  geom_function(fun = posterior2$posterior_function, color = "red") +
+  geom_function(fun = posterior3$posterior_function, color = "green") +
+  geom_function(fun = posterior4$posterior_function, color = "black") +
+  xlim(-100,100)
+```
+
+TODO: Include plot of 'updating factor'
+
+- examples: very wide prior vs very narrow prior
+
+- Something about different how different priors allow us to ask different questions. 
+
+TODO:
+Why are priors centered at 0?
+
+Consider two situations. In the first case, we distribute our beleif about the parameters values according to the distribution shown in blue. In the second case, we distribute our beleif about the parameters values according to the distribution shown in red. 
+
+
+As you'd expect, the value we assign to $\theta$ = 0 is increased. 
+
+```{r}
+require(ggplot2)
+s <- 10
+data_model <- likelihood(distribution = "normal", mean = 5.5 * s, sd = 32.35)
+posterior1 <- prior(distribution = "normal", mean = 0, 13.3 * s) * data_model
+posterior2 <- prior(distribution = "normal", mean = 5.5 * s, 13.3 * s) * data_model
+ggplot() + 
+  geom_function(fun = posterior1$posterior_function, colour = "blue") +
+  geom_function(fun = posterior2$posterior_function, color = "red") +
+  xlim(-100,100)
+
+sd_ratio(posterior1, 0)
+sd_ratio(posterior2, 0)
+```
+
+```{r}
+plot(posterior1, type = "pp")
+```
+
+```{r}
+plot(posterior2, type = "pp")
+```
+
+
+```{r}
+belief_change <- function(posterior, x) {
+  #posterior@prior_obj$fun(x) / posterior$posterior_function(x)
+  sd_ratio(posterior, x)
+}
+
+
+```
+
+```{r}
+require(ggplot2)
+data_model <- likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
+posterior1 <- prior(distribution = "normal", mean = 0, 13.3) * data_model
+posterior2 <- prior(distribution = "normal", mean = 5.5, .1) * data_model
+posterior3 <- prior(distribution = "normal", mean = 0, 100) * data_model
+
+posterior1_change <- purrr::partial(belief_change, posterior1)
+posterior2_change <- purrr::partial(belief_change, posterior2)
+posterior3_change <- purrr::partial(belief_change, posterior3)
+
+ggplot() + 
+  geom_function(fun = posterior1_change, aes(colour = "regular")) +
+  geom_function(fun = posterior2_change, aes(color = "narrow")) +
+  geom_function(fun = posterior3_change, aes(color = "wide")) +
+  scale_colour_manual(values = c("regular" = "green",
+                                 "narrow" = "red",
+                                 "wide" = "blue")) +
+  xlim(0,100) + ylim(0,10)
+```
+
+```{r}
+summary(sd_ratio(posterior1, 0))
+```
+
+```{r}
+summary(sd_ratio(posterior3, 0))
+```
+
+```{r}
+d = 2.03 / sqrt(80) # convert t to d
+data_model <- likelihood(distribution = "noncentral_d", d, 79)
+h0_mod <- prior(distribution = "point", point = 0)
+h1_mod <- prior(distribution = "normal", mean = 0, sd = 1)
+m0 <- data_model * h0_mod
+m1 <- data_model * h1_mod
+# TODO: Use the range from the prior -> pick the widest range
+```
+
+```{r}
+visual_compare(m0, m1)
+```
+
+
+```{r}
+visual_compare(m0, m1, type = "ratio")
+```
+
+
+```{r}
+plot(data_model)
+```
+
+```{r}
+plot(h0_mod)
+```
+
+```{r}
+plot(h1_mod)
+```
+
+
+```{r}
+
+f1 <- function(x){
+  n = 100
+  d = 2.03 / sqrt(n) # convert t to d
+  data_model <- likelihood(distribution = "noncentral_d", d, n  - 1)
+  h0_mod <- prior(distribution = "point", point = 0)
+  h1_mod <- prior(distribution = "cauchy", location = 0, scale = 1)
+  m0 <- data_model * h0_mod
+  m1 <- data_model * h1_mod
+  log(m1$prediction_function(x) / m0$prediction_function(x))
+}
+
+f2 <- function(x){
+  n = 10
+  d = 2.03 / sqrt(n) # convert t to d
+  data_model <- likelihood(distribution = "noncentral_d", d, n  - 1)
+  h0_mod <- prior(distribution = "point", point = 0)
+  h1_mod <- prior(distribution = "cauchy", location = 0, scale = 1)
+  m0 <- data_model * h0_mod
+  m1 <- data_model * h1_mod
+   log(m1$prediction_function(x) / m0$prediction_function(x))
+}
+
+ggplot() + 
+  geom_function(fun = f1, na.rm = TRUE, color = "blue") + 
+  geom_function(fun = f2, na.rm = TRUE, color = "seagreen") + 
+  xlim(0, .5) +
+        geom_hline(yintercept = 0, linetype = 2) + 
+        geom_hline(yintercept = log(1/3), linetype = 2, color = "red") + 
+        geom_hline(yintercept = log(1/10), linetype = 2, color = "red") + 
+        geom_hline(yintercept = log(1/100), linetype = 2, color = "red") + 
+        geom_hline(yintercept = log(3), linetype = 2, color = "blue") + 
+        geom_hline(yintercept = log(10), linetype = 2, color = "blue")  +
+        geom_hline(yintercept = log(100), linetype = 2, color = "blue")  +
+    ylim(c(log(1/150), log(150))) +
+  labs(x = "Effect size", y = "log BF")
+```
