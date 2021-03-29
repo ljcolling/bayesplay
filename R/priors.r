@@ -1,6 +1,6 @@
 
 range_as_text <- function(range) {
-  paste0(range[1]," to ", range[2])
+  paste0(range[1], " to ", range[2])
 }
 
 
@@ -110,30 +110,36 @@ normal_prior <- function(mean, sd, range) {
   }
 
   if (k != 1) {
-    func <- make_distribution("half_norm",
-                              list(range = range,
-                                   mean = mean,
-                                   sd = sd,
-                                   k = k))
+    func <- make_distribution(
+      "half_norm",
+      list(
+        range = range,
+        mean = mean,
+        sd = sd,
+        k = k
+      )
+    )
   }
 
 
   params <- list(mean = mean, sd = sd, range = range)
 
   desc <- paste0(
-  "Object of class prior\n",
-  "Distribution family: normal\n\n",
-  "Parameters\n",
-  "Mean: ", params$mean, "\n",
-  "SD: ", params$sd, "\n",
-  "Range: ", range_as_text(range)
+    "Object of class prior\n",
+    "Distribution family: normal\n\n",
+    "Parameters\n",
+    "Mean: ", params$mean, "\n",
+    "SD: ", params$sd, "\n",
+    "Range: ", range_as_text(range)
   )
 
   new(
     Class = "prior",
-    data = list(family = "normal",
-                params = as.data.frame(params),
-                fun = Vectorize(func)),
+    data = list(
+      family = "normal",
+      params = as.data.frame(params),
+      fun = Vectorize(func)
+    ),
     theta_range = range,
     type = "normal",
     func = Vectorize(func),
@@ -158,18 +164,20 @@ point_prior <- function(range, point = 0) {
   range <- c(point - width, point + width)
   params <- list(point = point)
   func <- make_distribution("point", list(point = point))
-  
+
   desc <- paste0(
-  "Object of class prior\n",
-  "Distribution family: point\n\n",
-  "Parameters\n",
-  "point: ", params$point
+    "Object of class prior\n",
+    "Distribution family: point\n\n",
+    "Parameters\n",
+    "point: ", params$point
   )
   new(
     Class = "prior",
-    data = list(family = "point",
-                params = as.data.frame(params),
-                fun = Vectorize(func)),
+    data = list(
+      family = "point",
+      params = as.data.frame(params),
+      fun = Vectorize(func)
+    ),
     theta_range = c(point, point),
     func = func,
     type = "point",
@@ -196,17 +204,19 @@ uniform_prior <- function(min, max, range) {
   params <- list(min = min, max = max)
 
   desc <- paste0(
-  "Object of class prior\n",
-  "Distribution family: uniform\n\n",
-  "Parameters\n",
-  "Min: ", params$min,"\n",
-  "Max: ", params$max
+    "Object of class prior\n",
+    "Distribution family: uniform\n\n",
+    "Parameters\n",
+    "Min: ", params$min, "\n",
+    "Max: ", params$max
   )
   new(
     Class = "prior",
-    data = list(family = "uniform",
-                params = as.data.frame(params),
-                fun = Vectorize(func)),
+    data = list(
+      family = "uniform",
+      params = as.data.frame(params),
+      fun = Vectorize(func)
+    ),
     theta_range = c(min, max),
     func = func,
     type = "normal",
@@ -233,8 +243,10 @@ student_t_prior <- function(mean, sd, df, range) {
   }
 
 
-  func <- make_distribution("t_dist",
-                            list(mean = mean, sd = sd, df = df, ncp = 0))
+  func <- make_distribution(
+    "t_dist",
+    list(mean = mean, sd = sd, df = df, ncp = 0)
+  )
   # normalise the pior
   # get the normalising factor
   if (range[1] != range[2]) {
@@ -249,32 +261,38 @@ student_t_prior <- function(mean, sd, df, range) {
   }
 
   if (k != 1) {
-    func <- make_distribution("half_t",
-                              list(range = range,
-                                   mean = mean,
-                                   sd = sd,
-                                   df = df,
-                                   ncp = 0,
-                                   k = k))
+    func <- make_distribution(
+      "half_t",
+      list(
+        range = range,
+        mean = mean,
+        sd = sd,
+        df = df,
+        ncp = 0,
+        k = k
+      )
+    )
   }
 
   desc <- paste0(
-  "Object of class prior\n",
-  "Distribution family: student t\n\n",
-  "Parameters\n",
-  "Mean: ", mean,"\n",
-  "SD: ", sd,"\n",
-  "DF: ", df,"\n",
-  "Range: ", range_as_text(range)
+    "Object of class prior\n",
+    "Distribution family: student t\n\n",
+    "Parameters\n",
+    "Mean: ", mean, "\n",
+    "SD: ", sd, "\n",
+    "DF: ", df, "\n",
+    "Range: ", range_as_text(range)
   )
 
 
   params <- list(mean = mean, sd = sd, df = df)
   new(
     Class = "prior",
-    data = list(family = "student t",
-                params = as.data.frame(params),
-                fun = Vectorize(func)),
+    data = list(
+      family = "student t",
+      params = as.data.frame(params),
+      fun = Vectorize(func)
+    ),
     theta_range = range,
     func = Vectorize(func),
     type = "normal",
@@ -290,8 +308,10 @@ student_t_prior <- function(mean, sd, df, range) {
 }
 
 cauchy_prior <- function(location = 0, scale, range) {
-  func <- make_distribution("cauchy_dist",
-                            list(location = location, scale = scale))
+  func <- make_distribution(
+    "cauchy_dist",
+    list(location = location, scale = scale)
+  )
   # normalise the pior
   # get the normalising factor
   if (range[1] != range[2]) {
@@ -306,43 +326,53 @@ cauchy_prior <- function(location = 0, scale, range) {
   }
 
   if (k != 1) {
-    func <- make_distribution("half_cauchy",
-                              list(range = range,
-                                   location = location,
-                                   scale = scale,
-                                   k = k))
+    func <- make_distribution(
+      "half_cauchy",
+      list(
+        range = range,
+        location = location,
+        scale = scale,
+        k = k
+      )
+    )
   }
 
   desc <- paste0(
-  "Object of class prior\n",
-  "Distribution family: cauchy\n\n",
-  "Parameters\n",
-  "Location: ", location, "\n",
-  "Scale: ", scale, "\n",
-  "Range: ", range_as_text(range)
+    "Object of class prior\n",
+    "Distribution family: cauchy\n\n",
+    "Parameters\n",
+    "Location: ", location, "\n",
+    "Scale: ", scale, "\n",
+    "Range: ", range_as_text(range)
   )
 
   params <- list(location = location, scale = scale, range = range)
 
   new(
     Class = "prior",
-    data = list(family = "cauchy",
-                params = as.data.frame(params),
-                fun = Vectorize(func)),
+    data = list(
+      family = "cauchy",
+      params = as.data.frame(params),
+      fun = Vectorize(func)
+    ),
     theta_range = range,
     func = Vectorize(func),
     type = "normal",
     desc = desc,
     dist_type = "continuous",
     plot = list(
-      range = c(location - qnorm(p = 0.9999) * scale,
-                location + qnorm(p = 0.9999) * scale),
+      range = c(
+        location - qnorm(p = 0.9999) * scale,
+        location + qnorm(p = 0.9999) * scale
+      ),
       labs = list(x = "\u03F4", y = "P(\u03F4)")
     ),
     parameters = list(location = location, scale = scale),
-    function_text = paste0("prior(\"cauchy\", location = ",
-                           location, ", scale =",
-                           scale, ")")
+    function_text = paste0(
+      "prior(\"cauchy\", location = ",
+      location, ", scale =",
+      scale, ")"
+    )
   )
 }
 
@@ -358,17 +388,19 @@ beta_prior <- function(alpha, beta, range) {
   params <- list(alpha = alpha, beta = beta)
 
   desc <- paste0(
-  "Object of class prior\n",
-  "Distribution family: beta\n\n",
-  "Parameters\n",
-  "Alpha: ", params$alpha,"\n",
-  "Beta: ", params$alpha
+    "Object of class prior\n",
+    "Distribution family: beta\n\n",
+    "Parameters\n",
+    "Alpha: ", params$alpha, "\n",
+    "Beta: ", params$alpha
   )
   new(
     Class = "prior",
-    data = list(family = "Beta",
-                params = as.data.frame(params),
-                fun = Vectorize(func)),
+    data = list(
+      family = "Beta",
+      params = as.data.frame(params),
+      fun = Vectorize(func)
+    ),
     theta_range = range,
     func = func,
     type = "normal",
@@ -381,8 +413,7 @@ beta_prior <- function(alpha, beta, range) {
     parameters = list(alpha = alpha, beta = beta),
     function_text = paste0(
       "prior(\"beta\", alpha = ",
-      alpha, ", beta =",beta, ")"
+      alpha, ", beta =", beta, ")"
     )
   )
 }
-

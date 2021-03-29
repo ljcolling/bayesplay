@@ -1,6 +1,5 @@
 context("Posterior distributions")
 test_that("posterior", {
-
   likelihood_obj <- likelihood(distribution = "noncentral_d", 0.7, df = 15)
   prior_obj <- prior(distribution = "cauchy", 0, 10)
   posterior_obj <- likelihood_obj * prior_obj
@@ -11,13 +10,15 @@ test_that("posterior", {
   bf <- h1 / h0
   sd <- prior_obj$fun(0) / posterior_obj$posterior_function(0)
   testthat::expect_equal(unclass(bf),
-                        unclass(sd),
-                        label = "BF does match Savage-Dicky Ratio")
+    unclass(sd),
+    label = "BF does match Savage-Dicky Ratio"
+  )
 
 
   testthat::expect_equal(unclass(h1),
-                        unclass(posterior_obj$prediction_function(0.7)),
-                        label = "Prediction function")
+    unclass(posterior_obj$prediction_function(0.7)),
+    label = "Prediction function"
+  )
 
   # test with a half cauchy prior
   likelihood_obj <- likelihood(distribution = "noncentral_d", 0.7, df = 15)
@@ -27,8 +28,9 @@ test_that("posterior", {
   h1 <- integral(likelihood_obj * prior_obj)
 
   testthat::expect_equal(unclass(h1),
-                        unclass(posterior_obj$prediction_function(0.7)),
-                        label = "Prediction function")
+    unclass(posterior_obj$prediction_function(0.7)),
+    label = "Prediction function"
+  )
 
 
 
@@ -46,6 +48,7 @@ test_that("posterior", {
   half <- posterior_obj_half$prediction_function(0.7)
 
   testthat::expect_gt(unclass(half),
-                        unclass(full),
-                        label = "Prediction function")
- })
+    unclass(full),
+    label = "Prediction function"
+  )
+})

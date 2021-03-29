@@ -10,37 +10,44 @@ test_that("basic BF calculations", {
   b <- m1 / m0
 
   testthat::expect_equal(unclass(b),
-                         unclass(0.89),
-                         tolerance = tol, scale = 1,
-                        label = "uniform prior")
+    unclass(0.89),
+    tolerance = tol, scale = 1,
+    label = "uniform prior"
+  )
 
   data_model <- likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
   h0_model <- prior(distribution = "point", point = 0)
-  h1_model <- prior(distribution = "normal", mean = 0, sd = 13.3,
-                    range = c(0, Inf))
+  h1_model <- prior(
+    distribution = "normal", mean = 0, sd = 13.3,
+    range = c(0, Inf)
+  )
   m1 <- integral(data_model * h1_model)
   m0 <- integral(data_model * h0_model)
   b <- m1 / m0
 
   testthat::expect_equal(unclass(b),
-                         unclass(0.97),
-                         tolerance = tol, scale = 1,
-                         label = "normal prior")
+    unclass(0.97),
+    tolerance = tol, scale = 1,
+    label = "normal prior"
+  )
 
 
 
   data_model <- likelihood(distribution = "normal", mean = 0.63, sd = 0.43)
-  h1_model <- prior(distribution = "normal", mean = 0, sd = 2.69,
-                    range = c(0, Inf))
+  h1_model <- prior(
+    distribution = "normal", mean = 0, sd = 2.69,
+    range = c(0, Inf)
+  )
   h0_model <- prior(distribution = "point", point = 0)
   m1 <- integral(data_model * h1_model)
   m0 <- integral(data_model * h0_model)
   b <- m1 / m0
 
   testthat::expect_equal(unclass(b),
-                         unclass(0.83),
-                         tolerance = tol, scale = 1,
-                         label = "half-normal prior")
+    unclass(0.83),
+    tolerance = tol, scale = 1,
+    label = "half-normal prior"
+  )
 
 
   data_model <- likelihood(distribution = "normal", mean = 15, sd = 13)
@@ -51,9 +58,10 @@ test_that("basic BF calculations", {
   b <- m1 / m0
 
   testthat::expect_equal(unclass(b),
-                         unclass(0.25),
-                         tolerance = tol, scale = 1,
-                         label = "normal prior")
+    unclass(0.25),
+    tolerance = tol, scale = 1,
+    label = "normal prior"
+  )
 
 
   data_model <- likelihood("student_t", mean = 5.47, sd = 32.2, df = 119)
@@ -64,9 +72,10 @@ test_that("basic BF calculations", {
   b <- m1 / m0
 
   testthat::expect_equal(unclass(b),
-                         unclass(0.97),
-                         tolerance = tol, scale = 1,
-                         label = "student_t prior (student_t likelihood)")
+    unclass(0.97),
+    tolerance = tol, scale = 1,
+    label = "student_t prior (student_t likelihood)"
+  )
 
   t <- 2.03
   n <- 80
@@ -79,15 +88,15 @@ test_that("basic BF calculations", {
   m0 <- integral(data_model * h0_model)
 
   b1 <- m1 / m0
-  b2 <-  1 / 1.557447
+  b2 <- 1 / 1.557447
 
   testthat::expect_equal(unclass(b1),
-                         unclass(unname(b2)),
-                         label = "default bayes t (orginal)",
-                         tolerance = tol, scale = 1
+    unclass(unname(b2)),
+    label = "default bayes t (orginal)",
+    tolerance = tol, scale = 1
   )
 
-# now do it with a one-sided prior
+  # now do it with a one-sided prior
   data_model <- likelihood(distribution = "noncentral_d", d = d, df = n - 1)
 
   h1_model <- prior("cauchy", scale = 1, range = c(0, Inf))
@@ -96,20 +105,22 @@ test_that("basic BF calculations", {
   m0 <- integral(data_model * h0_model)
 
   b1 <- m0 / m1
-  b2 <-  0.79745
+  b2 <- 0.79745
 
   testthat::expect_equal(unclass(b1),
-                         unclass(unname(b2)),
-                         label = "default bayes t (orginal) one-sided",
-                         tolerance = tol, scale = 1
+    unclass(unname(b2)),
+    label = "default bayes t (orginal) one-sided",
+    tolerance = tol, scale = 1
   )
 
 
 
 
 
-  data_model <- likelihood(distribution = "noncentral_t",
-                           t = t, df = n - 1)
+  data_model <- likelihood(
+    distribution = "noncentral_t",
+    t = t, df = n - 1
+  )
 
   h1_model <- prior("cauchy", scale = 1 * sqrt(n))
   h0_model <- prior("point", 0)
@@ -117,11 +128,12 @@ test_that("basic BF calculations", {
   m0 <- integral(data_model * h0_model)
 
   b1 <- m1 / m0
-  b2 <-  1 / 1.557447
+  b2 <- 1 / 1.557447
   testthat::expect_equal(unclass(b1),
-                         unclass(unname(b2)),
-                         label = "default bayes t (t version)",
-                         tolerance = tol, scale = 1)
+    unclass(unname(b2)),
+    label = "default bayes t (t version)",
+    tolerance = tol, scale = 1
+  )
 
 
 
@@ -131,11 +143,12 @@ test_that("basic BF calculations", {
   m1 <- data_model * alt_prior
   m0 <- data_model * null_prior
   b1 <- integral(m1) / integral(m0)
-  b2 <- 1 /  0.4887695
+  b2 <- 1 / 0.4887695
   testthat::expect_equal(unclass(b1),
-                         unclass(unname(b2)),
-                         label = "binomial likelihood, beta prior",
-                         tolerance = tol, scale = 1)
+    unclass(unname(b2)),
+    label = "binomial likelihood, beta prior",
+    tolerance = tol, scale = 1
+  )
 
 
   data_model <- likelihood(distribution = "binomial", 3, 12)
@@ -144,11 +157,12 @@ test_that("basic BF calculations", {
   m1 <- data_model * alt_prior
   m0 <- data_model * null_prior
   b1 <- integral(m1) / integral(m0)
-  b2 <- 1 /  0.6982422
+  b2 <- 1 / 0.6982422
   testthat::expect_equal(unclass(b1),
-                         unclass(unname(b2)),
-                         label = "binomial likelihood, uniform prior",
-                         tolerance = tol, scale = 1)
+    unclass(unname(b2)),
+    label = "binomial likelihood, uniform prior",
+    tolerance = tol, scale = 1
+  )
 
 
   data_model <- likelihood(distribution = "binomial", 3, 12)
@@ -157,10 +171,10 @@ test_that("basic BF calculations", {
   m1 <- data_model * alt_prior
   m0 <- data_model * null_prior
   b1 <- integral(m1) / integral(m0)
-  b2 <- 1 /  0.6982422
+  b2 <- 1 / 0.6982422
   testthat::expect_equal(unclass(b1),
-                         unclass(unname(b2)),
-                         label = "binomial likelihood, beta uniform",
-                         tolerance = tol, scale = 1)
-
+    unclass(unname(b2)),
+    label = "binomial likelihood, beta uniform",
+    tolerance = tol, scale = 1
+  )
 })

@@ -1,11 +1,11 @@
 
 dt_scaled <- function(x, df, mean = 0, sd = 1, ncp = 0, log = FALSE) {
   # if (ncp == 0) {
-    if (!log) {
-      return(stats::dt((x - mean) / sd, df, ncp = ncp, log = FALSE) / sd)
-    } else {
-      return(stats::dt((x - mean) / sd, df, ncp = ncp, log = TRUE) - log(sd))
-    }
+  if (!log) {
+    return(stats::dt((x - mean) / sd, df, ncp = ncp, log = FALSE) / sd)
+  } else {
+    return(stats::dt((x - mean) / sd, df, ncp = ncp, log = TRUE) - log(sd))
+  }
 }
 
 #################################################################
@@ -68,7 +68,6 @@ dt_scaled <- function(x, df, mean = 0, sd = 1, ncp = 0, log = FALSE) {
 #'
 #' # specify non-central t likelihood (d scaled)
 #' likelihood(distribution = "noncentral_d", d = 10, df = 10)
-#'
 likelihood <- function(distribution, ...) {
   parameters <- as.list(match.call(expand.dots = TRUE))
 
@@ -95,24 +94,26 @@ normal_likelihood <- function(mean, sd) { # nolint
   params <- list(mean = mean, sd = sd)
 
   desc <- paste0(
-  "Object of class likelihood\n",
-  "Distribution family: normal\n\n",
-  "Parameters\n",
-  "Mean: ", params$mean, "\n",
-  "SD: ", params$sd
+    "Object of class likelihood\n",
+    "Distribution family: normal\n\n",
+    "Parameters\n",
+    "Mean: ", params$mean, "\n",
+    "SD: ", params$sd
   )
 
   # desc <- paste0(
-    # "Parameters\nMean: ", params[[1]],
-    # "\nSD: ", params[[2]]
+  # "Parameters\nMean: ", params[[1]],
+  # "\nSD: ", params[[2]]
   # )
 
   # calculate the plot defaults
   width <- 4 * sd
   range <- c(mean - width, mean + width)
 
-  func <- make_distribution("norm_dist",
-                            list(mean = mean, sd = sd))
+  func <- make_distribution(
+    "norm_dist",
+    list(mean = mean, sd = sd)
+  )
 
   new(
     Class = "likelihood",
@@ -144,9 +145,9 @@ student_t_likelihood <- function(mean = 0, sd = 1, df = 0) {
   # parameters <- rlang::enquos(...)
   # purrr::is_empty(parameters)
   # if (purrr::is_empty(parameters)) {
-    # ncp <- 0
+  # ncp <- 0
   # } else {
-    # ncp <- " "
+  # ncp <- " "
   # }
 
   if (df == 0) {
@@ -157,20 +158,22 @@ student_t_likelihood <- function(mean = 0, sd = 1, df = 0) {
 
   params <- list(mean = mean, sd = sd, df = df)
   desc <- paste0(
-  "Object of class likelihood\n",
-  "Distribution family: student t\n\n",
-  "Parameters\n",
-  "Mean: ", params$mean, "\n",
-  "SD: ", params$sd, "\n",
-  "DF:", params$df
+    "Object of class likelihood\n",
+    "Distribution family: student t\n\n",
+    "Parameters\n",
+    "Mean: ", params$mean, "\n",
+    "SD: ", params$sd, "\n",
+    "DF:", params$df
   )
 
 
   # calculate the plot defaults
   width <- 4 * sd
   range <- c(mean - width, mean + width)
-  func <- make_distribution("t_dist",
-                            list(df = df, mean = mean, sd = sd))
+  func <- make_distribution(
+    "t_dist",
+    list(df = df, mean = mean, sd = sd)
+  )
 
 
   new(
@@ -197,8 +200,6 @@ student_t_likelihood <- function(mean = 0, sd = 1, df = 0) {
 
 
 noncentral_d_likelihood <- function(d, df) {
-
-
   if (df == 0) {
     stop("You must specify a `df` a non-central likelihood",
       call. = FALSE
@@ -207,11 +208,11 @@ noncentral_d_likelihood <- function(d, df) {
 
   params <- list(d = d, df = df)
   desc <- paste0(
-  "Object of class likelihood\n",
-  "Distribution family: non-central t (d scaled)\n\n",
-  "Parameters\n",
-  "d: ", params$d, "\n",
-  "DF:", params$df
+    "Object of class likelihood\n",
+    "Distribution family: non-central t (d scaled)\n\n",
+    "Parameters\n",
+    "d: ", params$d, "\n",
+    "DF:", params$df
   )
 
   # calculate the plot defaults
@@ -221,8 +222,10 @@ noncentral_d_likelihood <- function(d, df) {
   min <- d - 4 * sd
   max <- d + 4 * sd
   range <- c(min, max)
-  func <- make_distribution("non_central_t_dist",
-    list(df = df, d = d))
+  func <- make_distribution(
+    "non_central_t_dist",
+    list(df = df, d = d)
+  )
 
 
   new(
@@ -249,7 +252,6 @@ noncentral_d_likelihood <- function(d, df) {
 
 
 noncentral_t_likelihood <- function(t, df) {
-
   if (df == 0) {
     stop("You must specify a `df` a non-central likelihood",
       call. = FALSE
@@ -258,22 +260,24 @@ noncentral_t_likelihood <- function(t, df) {
 
   params <- list(t = t, df = df)
   desc <- paste0(
-  "Object of class likelihood\n",
-  "Distribution family: non-central t (t scaled)\n\n",
-  "Parameters\n",
-  "d: ", params$t, "\n",
-  "DF:", params$df
+    "Object of class likelihood\n",
+    "Distribution family: non-central t (t scaled)\n\n",
+    "Parameters\n",
+    "d: ", params$t, "\n",
+    "DF:", params$df
   )
 
-  d <- t * sqrt(df+1)
-  variance <- (df+df+2)/((df+1)*(df+1)) + ((d * d) / (2 * (df + df + 2)))
+  d <- t * sqrt(df + 1)
+  variance <- (df + df + 2) / ((df + 1) * (df + 1)) + ((d * d) / (2 * (df + df + 2)))
   sd <- sqrt(variance)
   min <- t - 4 * sd
   max <- t + 4 * sd
   # calculate the plot defaults
   range <- c(min, max)
-  func <- make_distribution("non_central_t_dist_t",
-    list(df = df, t = t))
+  func <- make_distribution(
+    "non_central_t_dist_t",
+    list(df = df, t = t)
+  )
 
 
   new(
@@ -288,7 +292,7 @@ noncentral_t_likelihood <- function(t, df) {
       "likelihood(distribution = \"noncentral_t\", t = x, df = ",
       df, ")"
     ),
-      observation = params$t,
+    observation = params$t,
     desc = desc,
     dist_type = "continuous",
     plot = list(
@@ -300,21 +304,21 @@ noncentral_t_likelihood <- function(t, df) {
 
 
 binomial_likelihood <- function(successes, trials) {
-
-
   params <- list(successes = successes, trials = trials)
   desc <- paste0(
-  "Object of class likelihood\n",
-  "Distribution family: binomial\n\n",
-  "Parameters\n",
-  "successes: ", params$successes, "\n",
-  "trials: ", params$trials
+    "Object of class likelihood\n",
+    "Distribution family: binomial\n\n",
+    "Parameters\n",
+    "successes: ", params$successes, "\n",
+    "trials: ", params$trials
   )
 
   # calculate the plot defaults
   range <- c(0, 1)
-  func <- make_distribution("binom_dist",
-    list(successes = successes, trials = trials))
+  func <- make_distribution(
+    "binom_dist",
+    list(successes = successes, trials = trials)
+  )
 
 
   new(
@@ -329,7 +333,7 @@ binomial_likelihood <- function(successes, trials) {
       "likelihood(distribution = \"binomial\", prob = x, trials = ",
       trials, ", successes = ", successes, ")"
     ),
-      observation = params$t,
+    observation = params$t,
     desc = desc,
     dist_type = "discrete",
     plot = list(
@@ -338,4 +342,3 @@ binomial_likelihood <- function(successes, trials) {
     )
   )
 }
-

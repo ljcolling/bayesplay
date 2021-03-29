@@ -22,5 +22,4 @@ test_that("Prior plots", {
   point <- prior("point", 2)
   point_plot <- plot(point)
   vdiffr::expect_doppelganger("point prior", point_plot)
-
 })
