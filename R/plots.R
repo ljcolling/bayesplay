@@ -26,7 +26,7 @@ handle_prior_likelihood <- function(x, n) {
   } else if (x@dist_type == "continuous") {
     return(plot_continuous(x, n))
   } else if (x@dist_type == "discrete") {
-    return(plost_discrete(x, n))
+    return(plot_discrete(x, n))
   }
 }
 
