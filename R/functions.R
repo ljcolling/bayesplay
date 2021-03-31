@@ -235,7 +235,7 @@ bf <- setClass("bf", contains = "numeric")
 #' # define a prior
 #' prior_model <- prior(distribution = "normal", mean = 5.5, sd = 13.3)
 #'
-#' model <- data_model * prior_model0
+#' model <- data_model * prior_model
 #'
 #' # take the integral
 #' integral(model)
@@ -374,7 +374,7 @@ calc_marginal <- function(likelihood, prior) {
 #' # define a prior
 #' prior_model <- prior(distribution = "normal", mean = 5.5, sd = 13.3)
 #'
-#' model <- data_model * prior_model0
+#' model <- data_model * prior_model
 #'
 #' # compute the Savage-Dickey density ratio at 0
 #' sd_ratio(model, 0)
