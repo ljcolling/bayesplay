@@ -84,5 +84,4 @@ likelihood(distribution = "noncentral_t", t = 10, df = 10)
 
 # specify non-central t likelihood (d scaled)
 likelihood(distribution = "noncentral_d", d = 10, df = 10)
-
 }

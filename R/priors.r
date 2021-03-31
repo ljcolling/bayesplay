@@ -98,16 +98,16 @@ normal_prior <- function(mean, sd, range) {
   func <- make_distribution("norm_dist", list(mean = mean, sd = sd))
   # normalise the pior
   # get the normalising factor
-  if (range[1] != range[2]) {
-    k <- 1 / stats::integrate(
-      f = func,
-      lower = range[1],
-      upper = range[2]
-    )$value
-  } else {
-    # It's a point prior
-    k <- 1
-  }
+  # if (range[1] != range[2]) {
+  k <- 1 / stats::integrate(
+    f = func,
+    lower = range[1],
+    upper = range[2]
+  )$value
+  # } else {
+  #   # It's a point prior
+  #   k <- 1
+  # }
 
   if (k != 1) {
     func <- make_distribution(
@@ -137,7 +137,7 @@ normal_prior <- function(mean, sd, range) {
     Class = "prior",
     data = list(
       family = "normal",
-      params = as.data.frame(params),
+      parameters = as.data.frame(params),
       fun = Vectorize(func)
     ),
     theta_range = range,
@@ -249,16 +249,16 @@ student_t_prior <- function(mean, sd, df, range) {
   )
   # normalise the pior
   # get the normalising factor
-  if (range[1] != range[2]) {
-    k <- 1 / stats::integrate(
-      f = func,
-      lower = range[1],
-      upper = range[2]
-    )$value
-  } else {
-    # It's a point prior
-    k <- 1
-  }
+  # if (range[1] != range[2]) {
+  k <- 1 / stats::integrate(
+    f = func,
+    lower = range[1],
+    upper = range[2]
+  )$value
+  # } else {
+  #   # It's a point prior
+  #   k <- 1
+  # }
 
   if (k != 1) {
     func <- make_distribution(
@@ -308,22 +308,25 @@ student_t_prior <- function(mean, sd, df, range) {
 }
 
 cauchy_prior <- function(location = 0, scale, range) {
+
+  # an error message belongs here
+
   func <- make_distribution(
     "cauchy_dist",
     list(location = location, scale = scale)
   )
   # normalise the pior
   # get the normalising factor
-  if (range[1] != range[2]) {
-    k <- 1 / stats::integrate(
-      f = func,
-      lower = range[1],
-      upper = range[2]
-    )$value
-  } else {
-    # It's a point prior
-    k <- 1
-  }
+  # if (range[1] != range[2]) {
+  k <- 1 / stats::integrate(
+    f = func,
+    lower = range[1],
+    upper = range[2]
+  )$value
+  # } else {
+  #   # It's a point prior
+  #   k <- 1
+  # }
 
   if (k != 1) {
     func <- make_distribution(

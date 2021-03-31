@@ -6,13 +6,19 @@ test_that("posterior", {
 
   h1 <- integral(likelihood_obj * prior_obj)
   h0 <- integral(likelihood_obj * prior("point", 0))
-
+  m1 <- likelihood_obj * prior_obj
   bf <- h1 / h0
   sd <- prior_obj$fun(0) / posterior_obj$posterior_function(0)
-  testthat::expect_equal(unclass(bf),
+ expect_equal(unclass(bf),
     unclass(sd),
     label = "BF does match Savage-Dicky Ratio"
   )
+
+ expect_equal(bf,
+    sd_ratio(m1, 0),
+    label = "BF does match Savage-Dicky Ratio (2)"
+  )
+  
 
 
   testthat::expect_equal(unclass(h1),

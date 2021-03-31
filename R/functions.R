@@ -43,14 +43,7 @@ make_distribution <- function(dist_name, params) {
     " sd = {params$sd})"
   )
 
-
-  # binomial distribution
-  # could add an ifelse in here?
-  # binom_dist <- g("function({params$x})",
-  # " ifelse({params$x} > 1 || {params$x} < 0, 0, dbinom(x = {params$successes},",
-  # " size = {params$trials},",
-  # " prob = {params$x}))")
-
+  # binom_dist
   binom_dist <- g(
     "function({params$x})",
     " dbinom(x = {params$successes},",
@@ -160,11 +153,7 @@ make_distribution <- function(dist_name, params) {
     prior <- e1
   }
 
-  # if (likelihood$family == "binomial") {
-  # theta_range <- c(0, 1)
-  # } else {
   theta_range <- prior@theta_range
-  # }
 
 
   likelihood_func <- likelihood@func
@@ -174,9 +163,6 @@ make_distribution <- function(dist_name, params) {
   k <- 1 # can delete this
 
   posterior_mod <- calc_posterior(likelihood, prior)
-  # marginal <- function(theta) {
-  # likelihood_func(theta = theta) * (prior_func(theta = theta))
-  # }
 
   marginal <- calc_marginal(likelihood, prior)
 
@@ -189,7 +175,7 @@ make_distribution <- function(dist_name, params) {
   } else {
     alt_val <- marginal(theta_range[[1]])
   }
-  # alt_func <- marginal
+
   data <- list(
     integral = alt_val,
     marginal = marginal,
@@ -243,6 +229,16 @@ bf <- setClass("bf", contains = "numeric")
 #' @export
 #'
 #' @examples
+#' # define a likelihood
+#' data_model <- likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
+#'
+#' # define a prior
+#' prior_model <- prior(distribution = "normal", mean = 5.5, sd = 13.3)
+#'
+#' model <- data_model * prior_model0
+#'
+#' # take the integral
+#' integral(model)
 integral <- function(obj) {
   if (class(obj) == "predictive") {
     return(new("auc", obj$integral))
@@ -326,7 +322,6 @@ make_predict <- function(data_model, prior_model) {
 }
 
 
-#' @export
 calc_posterior <- function(likelihood, prior) {
   make_posterior <- function(likelihood, prior, theta) {
     k <- bayesplay::integral(likelihood * prior)
@@ -361,24 +356,35 @@ calc_marginal <- function(likelihood, prior) {
 }
 
 
+#' Compute the Savage-Dickey density ratio
+#'
+#' Computes the Saveage-Dickey density ratio on a \code{predictive} object
+#' at a specified point
+#'
+#' @param x a \code{predictive} object
+#' @param point a point at which to evaluate the Savage-Dickey ratio
+#'
+#' @return A numeric of the Savage-Dickey density ratio
 #' @export
-sd_ratio <- function(posterior, theta) {
-  bf <- posterior@prior_obj$fun(theta) /
-    posterior$posterior_function(theta)
+#'
+#' @examples
+#' # define a likelihood
+#' data_model <- likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
+#'
+#' # define a prior
+#' prior_model <- prior(distribution = "normal", mean = 5.5, sd = 13.3)
+#'
+#' model <- data_model * prior_model0
+#'
+#' # compute the Savage-Dickey density ratio at 0
+#' sd_ratio(model, 0)
+#' @export
+sd_ratio <- function(x, point) {
+  bf <- x@prior_obj$fun(point) /
+    x$posterior_function(point)
 
   new("bf", bf)
 }
-
-
-#' @export
-integral <- function(obj) {
-  if (class(obj) == "predictive") {
-    return(new("auc", obj$integral))
-  } else if (class(obj) == "likelihood") {
-    return(stats::integrate(obj$fun, -Inf, Inf)$value)
-  }
-}
-
 
 #' @export
 new_observation <- function(obj, newdata, type = "auc") {
@@ -407,7 +413,6 @@ new_observation <- function(obj, newdata, type = "auc") {
 }
 
 
-#' @export
 plot_posterior <- function(x) {
   ggplot2::ggplot() +
     ggplot2::geom_function(

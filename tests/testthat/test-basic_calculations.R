@@ -5,8 +5,8 @@ test_that("basic BF calculations", {
   data_model <- likelihood(distribution = "normal", mean = 5, sd = 10)
   h1_model <- prior(distribution = "uniform", 0, 20)
   h0_model <- prior(distribution = "point", point = 0)
-  m1 <- integral(data_model * h1_model)
-  m0 <- integral(data_model * h0_model)
+  m1 <- (data_model * h1_model)
+  m0 <- (data_model * h0_model)
   b <- m1 / m0
 
   testthat::expect_equal(unclass(b),

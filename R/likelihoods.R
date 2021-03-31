@@ -8,6 +8,10 @@ dt_scaled <- function(x, df, mean = 0, sd = 1, ncp = 0, log = FALSE) {
   }
 }
 
+d_variance <- function(d, df) {
+  (df + df + 2) / ((df + 1) * (df + 1)) + ((d * d) / (2 * (df + df + 2)))
+}
+
 #################################################################
 ##                 DEFINITIONS OF THE LIKELIHOODS              ##
 #################################################################
@@ -74,7 +78,15 @@ likelihood <- function(distribution, ...) {
   distribution <- paste0(parameters$distribution %||%
     "normal", "_likelihood")
 
-
+  if (distribution %in% c(
+    "normal_likelihood",
+    "student_t_likelihood",
+    "binomial_likelihood",
+    "noncentral_d_likelihood",
+    "noncentral_t_likelihood"
+  ) == FALSE) {
+    stop("Unkown likelihood function")
+  }
 
   lik_fun <- purrr::partial(.f = rlang::as_function(distribution), ...)
 
@@ -85,7 +97,7 @@ likelihood <- function(distribution, ...) {
 # function that specifies a normal likelihood
 normal_likelihood <- function(mean, sd) { # nolint
   if (missing(mean) | missing(sd)) {
-    stop("You must specify a `mean` and `se` for a normal likelihood",
+    stop("You must specify a `mean` and `sd` for a normal likelihood",
       call. = FALSE
     )
   }
@@ -101,10 +113,6 @@ normal_likelihood <- function(mean, sd) { # nolint
     "SD: ", params$sd
   )
 
-  # desc <- paste0(
-  # "Parameters\nMean: ", params[[1]],
-  # "\nSD: ", params[[2]]
-  # )
 
   # calculate the plot defaults
   width <- 4 * sd
@@ -140,16 +148,6 @@ normal_likelihood <- function(mean, sd) { # nolint
 
 # function that specifies a student_t likelihood
 student_t_likelihood <- function(mean = 0, sd = 1, df = 0) {
-
-
-  # parameters <- rlang::enquos(...)
-  # purrr::is_empty(parameters)
-  # if (purrr::is_empty(parameters)) {
-  # ncp <- 0
-  # } else {
-  # ncp <- " "
-  # }
-
   if (df == 0) {
     stop("You must specify a `df` a student_t likelihood",
       call. = FALSE
@@ -216,9 +214,8 @@ noncentral_d_likelihood <- function(d, df) {
   )
 
   # calculate the plot defaults
-
-  sd <- sqrt((df + df + 2) / ((df + 1) * (df + 1)) +
-    ((d * d) / (2 * (df + df + 2))))
+  variance <- d_variance(d, df)
+  sd <- sqrt(variance)
   min <- d - 4 * sd
   max <- d + 4 * sd
   range <- c(min, max)
@@ -241,15 +238,13 @@ noncentral_d_likelihood <- function(d, df) {
       df, ")"
     ),
     observation = params$d,
-    desc = desc,
-    dist_type = "continuous",
+    desc = desc, dist_type = "continuous",
     plot = list(
       range = range,
       labs = list(x = "\u03F4", y = "L(\u03F4|x)")
     )
   )
 }
-
 
 noncentral_t_likelihood <- function(t, df) {
   if (df == 0) {
@@ -268,7 +263,7 @@ noncentral_t_likelihood <- function(t, df) {
   )
 
   d <- t * sqrt(df + 1)
-  variance <- (df + df + 2) / ((df + 1) * (df + 1)) + ((d * d) / (2 * (df + df + 2)))
+  variance <- d_variance(d, df)
   sd <- sqrt(variance)
   min <- t - 4 * sd
   max <- t + 4 * sd
@@ -330,10 +325,10 @@ binomial_likelihood <- function(successes, trials) {
     ),
     func = func,
     marginal = paste0(
-      "likelihood(distribution = \"binomial\", prob = x, trials = ",
-      trials, ", successes = ", successes, ")"
+      "likelihood(distribution = \"binomial\", trials = ",
+      trials, ", successes =  x)"
     ),
-    observation = params$t,
+    observation = params$successes,
     desc = desc,
     dist_type = "discrete",
     plot = list(

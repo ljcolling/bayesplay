@@ -16,3 +16,15 @@ A numeric of the point predictive value
 Computes the definite integral of a \code{predictive} object over the range
 of the parameter
 }
+\examples{
+# define a likelihood
+data_model <- likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
+
+# define a prior
+prior_model <- prior(distribution = "normal", mean = 5.5, sd = 13.3)
+
+model <- data_model * prior_model0
+
+# take the integral
+integral(model)
+}
