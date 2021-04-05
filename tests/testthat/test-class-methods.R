@@ -1,7 +1,7 @@
 test_that("multiplication works", {
   # expect_equal(2 * 2, 4)
 
-  
+
 
   lik <- likelihood("normal", 0, 1)
   expect_equal(names(lik), c("family", "parameters", "fun"))
@@ -11,9 +11,13 @@ test_that("multiplication works", {
   expect_equal(names(pri), c("family", "parameters", "fun"))
 
   pred <- lik * pri
-  expect_equal(names(pred),
-  c("integral", "marginal", "posterior_function", "prediction_function",
-  "prior.normalising.constant"))
+  expect_equal(
+    names(pred),
+    c(
+      "integral", "marginal", "posterior_function", "prediction_function",
+      "prior.normalising.constant"
+    )
+  )
 
   # check show methods
   # normal distribution
@@ -36,5 +40,4 @@ test_that("multiplication works", {
   expect_equal(pred1, pred2)
 
   expect_equal(integral(lik), 1)
-
 })

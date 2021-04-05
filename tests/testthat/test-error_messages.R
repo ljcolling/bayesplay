@@ -36,9 +36,9 @@ test_that("error messages", {
   # "You must specify `location` and `scale` for a cauchy  prior")
   data <- likelihood(distribution = "binomial", 2, 10)
   m0 <- data * prior(distribution = "beta", 10, 10)
-  m1 <- data *  prior("point", 0.5)
+  m1 <- data * prior("point", 0.5)
   expect_error(
-               visual_compare(m0, m1, type = "null"),
-        "Type null not supported")
-
+    visual_compare(m0, m1, type = "null"),
+    "Type null not supported"
+  )
 })

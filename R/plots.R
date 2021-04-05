@@ -157,15 +157,52 @@ visual_compare <- function(model1, model2, n = 101, type = NULL) {
 
   if (is.null(type)) {
     if (likelihood_obj@dist_type == "discrete") {
-      handle_desc_vc(likelihood_obj, model1_func, model2_func, model1_name, model2_name, plot_range, observation_df, n)
+      handle_desc_vc(
+                 likelihood_obj,
+                 model1_func,
+                 model2_func,
+                 model1_name,
+                 model2_name,
+                 plot_range,
+                 observation_df,
+                 n
+      )
     } else {
-      handle_con_vc(model1_func, model2_func, model1_name, model2_name, plot_range, observation_df, n)
+      handle_con_vc(
+                model1_func,
+                model2_func,
+                model1_name,
+                model2_name,
+                plot_range,
+                observation_df,
+                n
+      )
     }
   } else if (type == "ratio") {
     if (likelihood_obj@dist_type == "discrete") {
-      handle_desc_ratio(likelihood_obj, model1_func, model2_func, model1_name, model2_name, plot_range, observation_df, difference_df, n)
+      handle_desc_ratio(
+                    likelihood_obj,
+                    model1_func,
+                    model2_func,
+                    model1_name,
+                    model2_name,
+                    plot_range,
+                    observation_df,
+                    difference_df,
+                    n
+      )
     } else {
-      handle_con_ratio(likelihood_obj, model1_func, model2_func, model1_name, model2_name, plot_range, observation_df, difference_df, n)
+      handle_con_ratio(
+                   likelihood_obj,
+                   model1_func,
+                   model2_func,
+                   model1_name,
+                   model2_name,
+                   plot_range,
+                   observation_df,
+                   difference_df,
+                   n
+      )
     }
   } else {
     stop("Type ", type, " not supported")
@@ -218,7 +255,8 @@ handle_desc_ratio <- function(likelihood_obj,
 
   difference_data <- df
 
-  difference_data$y <- as.numeric(lapply(FUN = difference_func, X = as.numeric(df[, 1])))
+  difference_data$y <- as.numeric(lapply(FUN = difference_func,
+                                         X = as.numeric(df[, 1])))
 
   ggplot2::ggplot() +
     ggplot2::geom_line(
@@ -243,7 +281,13 @@ handle_desc_ratio <- function(likelihood_obj,
     NULL
 }
 
-handle_con_vc <- function(model1_func, model2_func, model1_name, model2_name, plot_range, observation_df, n) {
+handle_con_vc <- function(model1_func,
+                          model2_func,
+                          model1_name,
+                          model2_name,
+                          plot_range,
+                          observation_df,
+                          n) {
   ggplot2::ggplot() +
     ggplot2::geom_function(
       fun = model1_func,
@@ -285,8 +329,10 @@ handle_desc_vc <- function(likelihood_obj,
   model1_data <- df
   model2_data <- df
 
-  model1_data$y <- as.numeric(lapply(FUN = model1_func, X = as.numeric(df[, 1])))
-  model2_data$y <- as.numeric(lapply(FUN = model2_func, X = as.numeric(df[, 1])))
+  model1_data$y <- as.numeric(lapply(FUN = model1_func,
+                                     X = as.numeric(df[, 1])))
+  model2_data$y <- as.numeric(lapply(FUN = model2_func,
+                                     X = as.numeric(df[, 1])))
 
   ggplot2::ggplot() +
     # ggplot2::geom_line(data = model1_plot, ggplot2::aes(x = x, y = y)) +
@@ -325,18 +371,18 @@ handle_desc_vc <- function(likelihood_obj,
 
 # plot_predictions <- function(model, n = 101) {
 #   model_func <- model$prediction_function
-# 
+#
 #   plot_range <- model@likelihood_obj@plot$range
-# 
+#
 #   likelihood_obj <- model@likelihood_obj
-# 
+#
 #   observation <- likelihood_obj@observation
-# 
+#
 #   observation_df <- data.frame(
 #     x = observation,
 #     y = model_func(observation)
 #   )
-# 
+#
 #   ggplot2::ggplot() +
 #     ggplot2::geom_function(
 #       fun = model_func,

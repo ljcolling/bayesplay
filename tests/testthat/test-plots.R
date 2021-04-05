@@ -72,23 +72,22 @@ test_that("Prior plots", {
   prior_model <- prior(distribution = "beta", 10, 10)
   data_model <- likelihood(distribution = "binomial", 2, 10)
   m1 <- data_model * prior_model
-  prior_posterior1 <-  plot(m1, type = "pp")
+  prior_posterior1 <- plot(m1, type = "pp")
   posterior1 <- plot(m1, type = "posterior")
   lik <- plot(m1)
   vdiffr::expect_doppelganger("beta-binom pp", prior_posterior1)
   vdiffr::expect_doppelganger("beta-binom posterior", posterior1)
   vdiffr::expect_doppelganger("beta-binom weighted likelihood", lik)
-  
+
 
   # normal-normal
   prior_model <- prior(distribution = "normal", 0, 10)
   data_model <- likelihood(distribution = "normal", 5, 5)
   m1 <- data_model * prior_model
-  prior_posterior2  <-  plot(m1, type="pp")
+  prior_posterior2 <- plot(m1, type = "pp")
   posterior1 <- plot(m1, type = "posterior")
   lik <- plot(m1)
   vdiffr::expect_doppelganger("normal-normal pp", prior_posterior2)
   vdiffr::expect_doppelganger("normal posterior", posterior1)
   vdiffr::expect_doppelganger("normal weighted likelihood", lik)
-
 })
