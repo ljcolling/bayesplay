@@ -3,7 +3,7 @@ range_as_text <- function(range) {
   paste0(range[1], " to ", range[2])
 }
 
-
+prior_data_names <- c("family", "parameters", "prior_function")
 
 #################################################################
 ##                 DEFINITIONS OF THE PRIORS                   ##
@@ -14,30 +14,30 @@ range_as_text <- function(range) {
 
 #' Specify a prior
 #'
-#' @param distribution the prior distribution (see details)
+#' @param family the prior distribution (see details)
 #' @param ... see details
 #'
 #' @details
-#' ## Available distributions
-#' The following distributions can be used for the prior
+#' ## Available distribution families
+#' The following distributions families can be used for the prior
 #' * \code{normal} a normal distribution
 #' * \code{uniform} a uniform distribution
 #' * \code{point} a point
 #' The parameters that need to be specified will be dependent on the
-#' distribution
+#' family
 #' ## normal distribution
-#' When \code{distribution} is set to \code{normal} then the following
+#' When \code{family} is set to \code{normal} then the following
 #' parameters must be set
 #' * \code{mean} mean of the normal prior
 #' * \code{sd} standard deviation of the normal prior
 #' * \code{range} (optional) a vector specifying a paramter range
 #' ## uniform distribution
-#' When \code{distribution} is set to \code{uniform} then the following
+#' When \code{family} is set to \code{uniform} then the following
 #' parameters must be set
 #' * \code{min} the lower bound
 #' * \code{max} the upper bound
 #' ## point
-#' When \code{distribution} is set to \code{point} then the following
+#' When \code{family} is set to \code{point} then the following
 #' parameters may be set
 #' * \code{point} the location of the point prior (default: 0)
 #' @md
@@ -46,22 +46,22 @@ range_as_text <- function(range) {
 #'
 #' @examples
 #' # specify a half-normal (range 0 to Infinity) prior
-#' prior(distribution = "normal", mean = 0, sd = 13.3, range = c(0, Inf))
+#' prior(family = "normal", mean = 0, sd = 13.3, range = c(0, Inf))
 #'
 #' # specify a normal prior
-#' prior(distribution = "normal", mean = 0, sd = 13.3)
+#' prior(family = "normal", mean = 0, sd = 13.3)
 #'
 #' # specify a uniform prior
-#' prior(distribution = "uniform", min = 0, max = 20)
+#' prior(family = "uniform", min = 0, max = 20)
 #'
 #' # specify a point prior
-#' prior(distribution = "point", point = 0)
-prior <- function(distribution, ...) {
+#' prior(family = "point", point = 0)
+prior <- function(family, ...) {
   parameters <- as.list(match.call(expand.dots = TRUE))
 
 
   # set the default range of support
-  if (parameters$distribution == "beta") {
+  if (parameters$family == "beta") {
     default_range <- c(0, 1)
   } else {
     default_range <- c(-Inf, Inf)
@@ -72,15 +72,15 @@ prior <- function(distribution, ...) {
 
 
   # prior function needs parameters for
-  # distribution - normal, student_t, beta, cauchy, uniform, point
+  # family - normal, student_t, beta, cauchy, uniform, point
   # parameters - parameters for the distributions
   # range_of_support :: for one tailed etc
 
-  distribution <- paste0(parameters$distribution %||%
+  family <- paste0(parameters$family %||%
     "uniform", "_prior")
 
   lik_fun <- purrr::partial(
-    .f = rlang::as_function(distribution),
+    .f = rlang::as_function(family),
     range = range, ...
   )
 
@@ -95,7 +95,7 @@ normal_prior <- function(mean, sd, range) {
     stop("You must specify `mean` and `sd` for a normal prior", call. = FALSE)
   }
 
-  func <- make_distribution("norm_dist", list(mean = mean, sd = sd))
+  func <- make_distribution("norm_dist", list(mean = mean, sd = sd)) # nolint
   # normalise the pior
   # get the normalising factor
   # if (range[1] != range[2]) {
@@ -104,10 +104,6 @@ normal_prior <- function(mean, sd, range) {
     lower = range[1],
     upper = range[2]
   )$value
-  # } else {
-  #   # It's a point prior
-  #   k <- 1
-  # }
 
   if (k != 1) {
     func <- make_distribution(
@@ -133,13 +129,16 @@ normal_prior <- function(mean, sd, range) {
     "Range: ", range_as_text(range)
   )
 
+  data <- list(
+    family = "normal",
+    parameters = as.data.frame(params),
+    fun = Vectorize(func)
+  )
+  names(data) <- prior_data_names
+
   new(
     Class = "prior",
-    data = list(
-      family = "normal",
-      parameters = as.data.frame(params),
-      fun = Vectorize(func)
-    ),
+    data = data,
     theta_range = range,
     type = "normal",
     func = Vectorize(func),
@@ -163,7 +162,7 @@ point_prior <- function(range, point = 0) {
   width <- 4
   range <- c(point - width, point + width)
   params <- list(point = point)
-  func <- make_distribution("point", list(point = point))
+  func <- make_distribution("point", list(point = point)) # nolint
 
   desc <- paste0(
     "Object of class prior\n",
@@ -171,13 +170,16 @@ point_prior <- function(range, point = 0) {
     "Parameters\n",
     "point: ", params$point
   )
+
+  data <- list(
+    family = "point",
+    params = as.data.frame(params),
+    fun = Vectorize(func)
+  )
+  names(data) <- prior_data_names
   new(
     Class = "prior",
-    data = list(
-      family = "point",
-      params = as.data.frame(params),
-      fun = Vectorize(func)
-    ),
+    data = data,
     theta_range = c(point, point),
     func = func,
     type = "point",
@@ -200,7 +202,7 @@ uniform_prior <- function(min, max, range) {
   }
 
 
-  func <- make_distribution("uni_dist", list(min = min, max = max))
+  func <- make_distribution("uni_dist", list(min = min, max = max)) # nolint
   params <- list(min = min, max = max)
 
   desc <- paste0(
@@ -210,13 +212,18 @@ uniform_prior <- function(min, max, range) {
     "Min: ", params$min, "\n",
     "Max: ", params$max
   )
+
+  data <- list(
+    family = "uniform",
+    params = as.data.frame(params),
+    fun = Vectorize(func)
+  )
+
+  names(data) <- prior_data_names
+
   new(
     Class = "prior",
-    data = list(
-      family = "uniform",
-      params = as.data.frame(params),
-      fun = Vectorize(func)
-    ),
+    data = data,
     theta_range = c(min, max),
     func = func,
     type = "normal",
@@ -255,10 +262,6 @@ student_t_prior <- function(mean, sd, df, range) {
     lower = range[1],
     upper = range[2]
   )$value
-  # } else {
-  #   # It's a point prior
-  #   k <- 1
-  # }
 
   if (k != 1) {
     func <- make_distribution(
@@ -284,15 +287,19 @@ student_t_prior <- function(mean, sd, df, range) {
     "Range: ", range_as_text(range)
   )
 
-
   params <- list(mean = mean, sd = sd, df = df)
+
+  data <- list(
+    family = "student t",
+    params = as.data.frame(params),
+    fun = Vectorize(func)
+  )
+
+  names(data) <- prior_data_names
+
   new(
     Class = "prior",
-    data = list(
-      family = "student t",
-      params = as.data.frame(params),
-      fun = Vectorize(func)
-    ),
+    data = data,
     theta_range = range,
     func = Vectorize(func),
     type = "normal",
@@ -323,10 +330,6 @@ cauchy_prior <- function(location = 0, scale, range) {
     lower = range[1],
     upper = range[2]
   )$value
-  # } else {
-  #   # It's a point prior
-  #   k <- 1
-  # }
 
   if (k != 1) {
     func <- make_distribution(
@@ -351,13 +354,18 @@ cauchy_prior <- function(location = 0, scale, range) {
 
   params <- list(location = location, scale = scale, range = range)
 
+  data <- list(
+    family = "cauchy",
+    params = as.data.frame(params),
+    fun = Vectorize(func)
+  )
+
+  names(data) <- prior_data_names
+  
+
   new(
     Class = "prior",
-    data = list(
-      family = "cauchy",
-      params = as.data.frame(params),
-      fun = Vectorize(func)
-    ),
+    data = data,
     theta_range = range,
     func = Vectorize(func),
     type = "normal",
@@ -387,7 +395,7 @@ beta_prior <- function(alpha, beta, range) {
   }
 
 
-  func <- make_distribution("beta_dist", list(alpha = alpha, beta = beta))
+  func <- make_distribution("beta_dist", list(alpha = alpha, beta = beta)) # nolint
   params <- list(alpha = alpha, beta = beta)
 
   desc <- paste0(
@@ -397,13 +405,16 @@ beta_prior <- function(alpha, beta, range) {
     "Alpha: ", params$alpha, "\n",
     "Beta: ", params$alpha
   )
+
+  data <- list(
+    family = "Beta",
+    params = as.data.frame(params),
+    fun = Vectorize(func)
+  )
+  names(data) <- prior_data_names
   new(
     Class = "prior",
-    data = list(
-      family = "Beta",
-      params = as.data.frame(params),
-      fun = Vectorize(func)
-    ),
+    data = data,
     theta_range = range,
     func = func,
     type = "normal",

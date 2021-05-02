@@ -2,9 +2,10 @@ context("Basic calculations")
 
 test_that("basic BF calculations", {
   tol <- 0.005
-  data_model <- likelihood(distribution = "normal", mean = 5, sd = 10)
-  h1_model <- prior(distribution = "uniform", 0, 20)
-  h0_model <- prior(distribution = "point", point = 0)
+
+  data_model <- likelihood(family = "normal", mean = 5, sd = 10)
+  h1_model <- prior(family = "uniform", 0, 20)
+  h0_model <- prior(family = "point", point = 0)
   m1 <- (data_model * h1_model)
   m0 <- (data_model * h0_model)
   b <- m1 / m0
@@ -15,10 +16,10 @@ test_that("basic BF calculations", {
     label = "uniform prior"
   )
 
-  data_model <- likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
-  h0_model <- prior(distribution = "point", point = 0)
+  data_model <- likelihood(family = "normal", mean = 5.5, sd = 32.35)
+  h0_model <- prior(family = "point", point = 0)
   h1_model <- prior(
-    distribution = "normal", mean = 0, sd = 13.3,
+    family = "normal", mean = 0, sd = 13.3,
     range = c(0, Inf)
   )
   m1 <- integral(data_model * h1_model)
@@ -33,12 +34,12 @@ test_that("basic BF calculations", {
 
 
 
-  data_model <- likelihood(distribution = "normal", mean = 0.63, sd = 0.43)
+  data_model <- likelihood(family = "normal", mean = 0.63, sd = 0.43)
   h1_model <- prior(
-    distribution = "normal", mean = 0, sd = 2.69,
+    family = "normal", mean = 0, sd = 2.69,
     range = c(0, Inf)
   )
-  h0_model <- prior(distribution = "point", point = 0)
+  h0_model <- prior(family = "point", point = 0)
   m1 <- integral(data_model * h1_model)
   m0 <- integral(data_model * h0_model)
   b <- m1 / m0
@@ -50,9 +51,9 @@ test_that("basic BF calculations", {
   )
 
 
-  data_model <- likelihood(distribution = "normal", mean = 15, sd = 13)
-  h1_model <- prior(distribution = "normal", mean = 50, sd = 14)
-  h0_model <- prior(distribution = "point", point = 0)
+  data_model <- likelihood(family = "normal", mean = 15, sd = 13)
+  h1_model <- prior(family = "normal", mean = 50, sd = 14)
+  h0_model <- prior(family = "point", point = 0)
   m1 <- integral(data_model * h1_model)
   m0 <- integral(data_model * h0_model)
   b <- m1 / m0
@@ -77,10 +78,72 @@ test_that("basic BF calculations", {
     label = "student_t prior (student_t likelihood)"
   )
 
+
+
+
+
+  # default bayes t-test
+  # BayesFactor will be temporarily installed for the initial tests
+  # paired
+  n <- 10
+  m <- 0.8880938
+  s <- 0.5952841
+  d <- m / s
+  t <- d * sqrt(n)
+  df <- n - 1
+  data_model <- likelihood("noncentral_t", t, df)
+  prior_model <- prior("cauchy", 0, 1 * sqrt(df + 1))
+  bf <- sd_ratio(data_model * prior_model, 0)
+  bf_bayesfactor <- 42.44814
+
+  testthat::expect_equal(bf_bayesfactor,
+    unclass(bf),
+    tolerance = tol, scale = 1)
+
+  data_model <- likelihood(family = "noncentral_d", d, n = n)
+  prior_model <- prior(family = "cauchy", 0, 1)
+  bf <- sd_ratio(data_model * prior_model, 0)
+  testthat::expect_equal(bf_bayesfactor,
+    unclass(bf),
+    tolerance = tol, scale = 1)
+
+
+  # independent samples
+  n1 <- 17
+  n2 <- 18
+  m1 <- 18.04028
+  m2 <- 21.00756
+  s1 <- 17.56803
+  s2 <- 17.61612
+  md_diff <- m1 - m2
+  sd_pooled <- sqrt((((n1 - 1) * s1^2) + ((n2 - 1) * s2^2)) / (n1 + n2 - 2))
+  d <- md_diff / sd_pooled
+
+  t <- d / sqrt(1 / n1 + 1 / n2)
+  df <- n1 + n2 - 2
+
+  bf_bayesfactor <- 0.274111
+  data_model <- likelihood(family = "noncentral_t", t, df)
+  prior_model <- prior(family = "cauchy", 0, 1 * sqrt((n1 * n2) / (n1 + n2)))
+  bf <- bayesplay::sd_ratio(data_model * prior_model, 0)
+
+  testthat::expect_equal(bf_bayesfactor,
+    unclass(bf),
+    tolerance = tol, scale = 1)
+
+
+  data_model <- likelihood("noncentral_d2", d = d,  n1 = n1, n2 = n2)
+  prior_model <- prior("cauchy", 0, 1)
+  bf <- bayesplay::sd_ratio(data_model * prior_model, 0)
+
+  testthat::expect_equal(bf_bayesfactor,
+    unclass(bf),
+    tolerance = tol, scale = 1)
+
   t <- 2.03
   n <- 80
   d <- t / sqrt(n)
-  data_model <- likelihood(distribution = "noncentral_d", d = d, df = n - 1)
+  data_model <- likelihood(family = "noncentral_d", d = d, n = n)
 
   h1_model <- prior("cauchy", scale = 1)
   h0_model <- prior("point", 0)
@@ -97,7 +160,7 @@ test_that("basic BF calculations", {
   )
 
   # now do it with a one-sided prior
-  data_model <- likelihood(distribution = "noncentral_d", d = d, df = n - 1)
+  data_model <- likelihood(family = "noncentral_d", d = d, n = n)
 
   h1_model <- prior("cauchy", scale = 1, range = c(0, Inf))
   h0_model <- prior("point", 0)
@@ -118,7 +181,7 @@ test_that("basic BF calculations", {
 
 
   data_model <- likelihood(
-    distribution = "noncentral_t",
+    family = "noncentral_t",
     t = t, df = n - 1
   )
 
@@ -137,9 +200,9 @@ test_that("basic BF calculations", {
 
 
 
-  data_model <- likelihood(distribution = "binomial", 3, 12)
-  alt_prior <- prior(distribution = "beta", alpha = 1, beta = 2)
-  null_prior <- prior(distribution = "point", point = 0.5)
+  data_model <- likelihood(family = "binomial", 3, 12)
+  alt_prior <- prior(family = "beta", alpha = 1, beta = 2)
+  null_prior <- prior(family = "point", point = 0.5)
   m1 <- data_model * alt_prior
   m0 <- data_model * null_prior
   b1 <- integral(m1) / integral(m0)
@@ -151,9 +214,9 @@ test_that("basic BF calculations", {
   )
 
 
-  data_model <- likelihood(distribution = "binomial", 3, 12)
-  alt_prior <- prior(distribution = "uniform", min = 0, max = 1)
-  null_prior <- prior(distribution = "point", point = 0.5)
+  data_model <- likelihood(family = "binomial", 3, 12)
+  alt_prior <- prior(family = "uniform", min = 0, max = 1)
+  null_prior <- prior(family = "point", point = 0.5)
   m1 <- data_model * alt_prior
   m0 <- data_model * null_prior
   b1 <- integral(m1) / integral(m0)
@@ -165,9 +228,9 @@ test_that("basic BF calculations", {
   )
 
 
-  data_model <- likelihood(distribution = "binomial", 3, 12)
-  alt_prior <- prior(distribution = "beta", 1, 1)
-  null_prior <- prior(distribution = "point", point = 0.5)
+  data_model <- likelihood(family = "binomial", 3, 12)
+  alt_prior <- prior(family = "beta", 1, 1)
+  null_prior <- prior(family = "point", point = 0.5)
   m1 <- data_model * alt_prior
   m0 <- data_model * null_prior
   b1 <- integral(m1) / integral(m0)

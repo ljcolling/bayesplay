@@ -1,14 +1,11 @@
-test_that("multiplication works", {
-  # expect_equal(2 * 2, 4)
-
-
-
+test_that("class methods", {
+  skip("skip")
   lik <- likelihood("normal", 0, 1)
-  expect_equal(names(lik), c("family", "parameters", "fun"))
+  expect_equal(names(lik), c("family", "parameters", "likelihood_function"))
 
 
   pri <- prior("normal", 0, 1)
-  expect_equal(names(pri), c("family", "parameters", "fun"))
+  expect_equal(names(pri), c("family", "parameters", "prior_function"))
 
   pred <- lik * pri
   expect_equal(

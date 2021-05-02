@@ -4,10 +4,10 @@
 \alias{likelihood}
 \title{Specify a likelihood}
 \usage{
-likelihood(distribution, ...)
+likelihood(family, ...)
 }
 \arguments{
-\item{distribution}{the likelihood distribution (see details)}
+\item{family}{the likelihood distribution (see details)}
 
 \item{...}{see details}
 }
@@ -18,22 +18,23 @@ an object of class \code{likelihood}
 Specify a likelihood
 }
 \details{
-\subsection{Available distributions}{
+\subsection{Available distribution families}{
 
-The following distributions can be used for the likelihood
+The following distribution families can be used for the likelihood
 \itemize{
 \item \code{normal} a normal distribution
 \item \code{student_t} a scaled and shifted t-distribution
-\item \code{noncentral_t} a noncentral t distribution (t scaled)
-\item \code{noncentral_d} a noncentral t distribution (d scaled)
+\item \code{noncentral_t} a noncentral t (for t statistic)
+\item \code{noncentral_d} a noncentral t (for one sample d)
+\item \code{noncentral_d2} a noncentral t (for independent samples d)
 The parameters that need to be specified will be dependent on the
-distribution
+family
 }
 }
 
 \subsection{normal distribution}{
 
-When \code{distribution} is set to \code{normal} then the following
+When \code{family} is set to \code{normal} then the following
 parameters must be set
 \itemize{
 \item \code{mean} mean of the normal likelihood
@@ -43,7 +44,7 @@ parameters must be set
 
 \subsection{student_t distribution}{
 
-When \code{distribution} is set to \code{student_t} then the following
+When \code{family} is set to \code{student_t} then the following
 parameters may be set
 \itemize{
 \item \code{mean} mean of the scaled and shifted t likelihood
@@ -54,7 +55,7 @@ parameters may be set
 
 \subsection{noncentral_t distribution}{
 
-When \code{distribution} is set to \code{noncentral_t} then the following
+When \code{family} is set to \code{noncentral_t} then the following
 parameters may be set
 \itemize{
 \item \code{t} the t value of the data
@@ -64,24 +65,38 @@ parameters may be set
 
 \subsection{noncentral_d distribution}{
 
-When \code{distribution} is set to \code{noncentral_d} then the following
+When \code{family} is set to \code{noncentral_d} then the following
 parameters may be set
 \itemize{
 \item \code{d} the d (mean / sd) value of the data
-\item \code{df} degrees of freedom
+\item \code{n} the sample size
 }
+}
+
+\subsection{noncentral_d2 distribution}{
+
+When \code{family} is set to \code{noncentral_d2} then the following
+parameters may be set
+\itemize{
+\item \code{d} the d (mean / s_pooled) value of the data
+\item \code{n1} the sample size of group 1
+\item \code{n2} the sample size of group 2
+}
+
+\eqn{s_{pooled}}{s_pooled} is set as below:
+\deqn{s_{\mathrm{pooled}} = \sqrt{\frac{(n_1 - 1)s^2_1 + (n_2 - 1)s^2_2 }{n_1 + n_2 - 2}}}{\sqrt(((n1 - 1) * s1^2 + (n2 - 1)*s2^2)/(n1 + n2 - 2))}
 }
 }
 \examples{
 # specify a normal likelihood
-likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
+likelihood(family = "normal", mean = 5.5, sd = 32.35)
 
 # specify a scaled and shifted t likelihood
-likelihood(distribution = "student_t", mean = 5.5, sd = 32.35, df = 10)
+likelihood(family = "student_t", mean = 5.5, sd = 32.35, df = 10)
 
 # specify non-central t likelihood (t scaled)
-likelihood(distribution = "noncentral_t", t = 10, df = 10)
+likelihood(family = "noncentral_t", t = 10, df = 10)
 
 # specify non-central t likelihood (d scaled)
-likelihood(distribution = "noncentral_d", d = 10, df = 10)
+likelihood(family = "noncentral_d", d = 10, n = 10)
 }

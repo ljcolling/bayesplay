@@ -15,18 +15,31 @@ in_range <- function(x, range) {
 }
 
 
+`%<-%` <- zeallot::`%<-%` # nolint
+
+integer_breaks <- function(n = 5, ...) {
+  fxn <- function(x) {
+    breaks <- floor(pretty(x, n, ...))
+    names(breaks) <- attr(breaks, "labels")
+    breaks
+  }
+  return(fxn)
+}
+
 # function factory for distribution functions
 make_distribution <- function(dist_name, params) {
   g <- glue::glue
 
   eval2 <- function(x) {
     eval(parse(text = x))
+
   }
 
   # add x = theta if it's missing
   if ("x" %in% names(params) == FALSE) {
     params <- c(list(x = "theta"), params)
   }
+
 
   # point
   point <- g(
@@ -79,19 +92,31 @@ make_distribution <- function(dist_name, params) {
     " sd = {params$sd})"
   )
 
-  non_central_t_dist <- g(
+
+
+  non_central_d_dist <- g(
     "function({params$x})",
-    " dt(x = {params$d} * sqrt(params$df + 1),",
-    " df = {params$df},",
-    " ncp = {sqrt(params$df + 1)} * {params$x})"
+    " dt(x = {params$d * sqrt(params$n - 0)},",
+    " df = {params$n - 1},",
+    " ncp = {sqrt(params$n - 0)} * {params$x})"
   )
 
-  non_central_t_dist_t <- g(
+
+  non_central_t_dist <- g(
     "function({params$x})",
     " dt(x = {params$t},",
     " df = {params$df},",
     " ncp = {params$x})"
   )
+
+  # NOTE: THIS IS DEFINED IN TERMS OF N1 and N2
+  non_central_d2_dist <- g(
+    "function({params$x})",
+    " dt(x = {params$d / sqrt( (1/params$n1) + (1 / params$n2 ) )},",
+    " df = {params$n1 + params$n2 - 2},",
+    " ncp = {sqrt((params$n1 * params$n2)/(params$n1 + params$n2))} * {params$x})"
+  )
+
 
 
   half_t <- g(
@@ -134,9 +159,12 @@ make_distribution <- function(dist_name, params) {
   )
 
   return_func <- eval(parse(text = dist_name))
+
   return(eval2(return_func))
 }
 
+#make_distribution(dist_name = "non_central_t_dist", params = list(df = 10, t = 2.5, x = "theta"))
+#make_distribution(dist_name = "non_central_d_dist", params = list(n = 10, d = 2.5, x = "theta"))
 
 
 #' @importFrom methods new
@@ -162,7 +190,7 @@ make_distribution <- function(dist_name, params) {
   # normalise the pior
   k <- 1 # can delete this
 
-  posterior_mod <- calc_posterior(likelihood, prior)
+  posterior_func <- calc_posterior(likelihood, prior)
 
   marginal <- calc_marginal(likelihood, prior)
 
@@ -176,10 +204,21 @@ make_distribution <- function(dist_name, params) {
     alt_val <- marginal(theta_range[[1]])
   }
 
+  evidence_func <- function(x) posterior_func(x) / prior_func(x)
+
+  marginal_func <- function(x) likelihood_func(x) / evidence_func(x)
+
+  conditional_func <- function(x) evidence_func(x) * marginal_func(x)
+
+
+
   data <- list(
     integral = alt_val,
-    marginal = marginal,
-    posterior_function = posterior_mod,
+    marginal_function = marginal_func,
+    evidence_function = evidence_func,
+    posterior_function = posterior_func,
+    conditional_function = conditional_func,
+    weighted_likelihood_function = marginal,
     prediction_function = make_predict(likelihood, prior),
     prior.normalising.constant = k
   )
@@ -205,6 +244,11 @@ make_distribution <- function(dist_name, params) {
   )
 }
 # }
+
+
+
+
+
 
 `/.predictive` <- function(e1, e2) {
   bf <- e1@data$integral / e2@data$integral
@@ -243,9 +287,11 @@ integral <- function(obj) {
   if (class(obj) == "predictive") {
     return(new("auc", obj$integral))
   } else if (class(obj) == "likelihood") {
-    return(stats::integrate(obj$fun, -Inf, Inf)$value)
+    return(stats::integrate(obj@func, -Inf, Inf)$value)
   }
 }
+
+
 
 #' @export
 `/.auc` <- function(e1, e2) {
@@ -356,6 +402,23 @@ calc_marginal <- function(likelihood, prior) {
 }
 
 
+calc_ratio <- function(likelihood, prior) {
+  make_marginal <- function(likelihood, prior, theta) {
+    prior_func <- prior@func
+    likelihood_func <- likelihood@func
+
+    (prior_func(theta) /
+      likelihood_func(theta))
+  }
+
+  purrr::partial(make_marginal,
+    likelihood = likelihood,
+    prior = prior
+  )
+}
+
+
+
 #' Compute the Savage-Dickey density ratio
 #'
 #' Computes the Saveage-Dickey density ratio on a \code{predictive} object
@@ -380,7 +443,7 @@ calc_marginal <- function(likelihood, prior) {
 #' sd_ratio(model, 0)
 #' @export
 sd_ratio <- function(x, point) {
-  bf <- x@prior_obj$fun(point) /
+  bf <- x@prior_obj$prior_function(point) /
     x$posterior_function(point)
 
   new("bf", bf)

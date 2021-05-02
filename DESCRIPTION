@@ -23,4 +23,6 @@ RoxygenNote: 7.1.1
 Imports: 
     purrr,
     methods,
-    rlang   
+    rlang,
+    zeallot,
+    gginnards

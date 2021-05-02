@@ -26,80 +26,11 @@ To calculate a posterior, two things are needed:
 
 1. A **prior**, that assigns probabilities to parameter values. This prior can be thought of as beliefs one holds about parameters values before the data have been seen. 
 
-2. A **likelihood**, that provides **evidence**, obtained from the data, for different parameter values. (For more on the likelihood itself, see []).
+2. A **likelihood**, that provides **evidence**, obtained from the data, for different parameter values. 
 
 From these two ingredients it is possible to calculate a **posterior**, that represents our new beliefs about parameter values after the **evidence** from the data has been taken into account. 
 
 First, we’ll define a prior:
-
-```{r}
-prior1 <- prior("beta", 2.5, 1)
-plot(prior1) 
-```
-This prior assigns an equal probability to each value of $\theta$.  
-
-Next, we'll define the likelihood. 
-
-```{r}
-data1 <- likelihood("binomial", 7, 10)
-plot(data1)
-```
-
-```{r}
-post1 <- data1 * prior1
-x <- post1
-ggplot() + geom_function(fun = x$evidence_function)
-```
-
-
-```{r}
-x <- post1
-ggplot() + geom_function(fun = x$marginal_function)
-```
-
-```{r}
-
-```
-
-```{r}
-post1 <- prior1 * data1
-plot(post1)
-```
-
-```{r}
-plot(post1, type = "posterior")
-```
-
-```{r}
-plot(post1, type = "pp")
-```
-
-```{r}
-plot(post1, type = "prediction")
-```
-```{r}
-ggplot() + geom_function(fun = x$evidence_function)
-```
-```{r}
-likelihood("binomial", 1, 4) * prior("beta",1,1)
-
-```
-```{r}
-plot(likelihood("binomial", 7, 10)) + geom_vline(xintercept =  7/ 10, linetype = 2)
-```
-
-```{r}
-plot(likelihood("binomial", 7, 10) * prior("beta", 1, 1), type = "posterior")  + geom_vline(xintercept =  7/10, linetype = 2)
-```
-
-
-
-```{r}
-purrr::map_dbl(seq(0, 1, .001), function(x) likelihood("binomial", 1, 4)$likelihood_function(x)) %>% mean()
-
-```
-
-
 
 ```{r}
 prior_model <- prior(distribution = "normal", mean = 0, sd = 13.3, range = c(0, Inf))
@@ -520,35 +451,6 @@ ggplot() +
     ylim(c(log(1/150), log(150))) +
   labs(x = "Effect size", y = "log BF")
 ```
-```{r}
-library(BayesFactor)
-set.seed(666)
-n1 = 145
-n2 = 100
-x = rnorm(n1, 44, 67)
-y = rnorm(n2, 32, 56)
-sqrt((n1 * n2)/ (n1 + n2))
-BayesFactor::ttestBF(x = x, y = y, paired = FALSE, rscale = .707)
-tobj <- t.test(x, y, paired = FALSE, var.equal = TRUE)
-t = as.numeric(tobj$statistic)
-df = as.numeric(tobj$parameter)
-data_model <- likelihood("noncentral_t", t, df)
-prior_model <- prior("cauchy", 0, 0.707 * sqrt((n1 * n2)/ (n1 + n2)))
-M1 <- integral(data_model * prior_model)
-M0 <- integral(data_model * prior("point"))
-M1 / M0
 
-bayesplay::sd_ratio(data_model * prior_model, 0)
-n1 = 10
-x = rnorm(n1, 44, 67)
-y = rnorm(n1, 32, 56)
-corObj <- cor.test(x,y)
-t <- unname(corObj$statistic)
-df <- unname(corObj$parameter)
-BayesFactor::correlationBF(x, y)
-sd_ratio(likelihood("noncentral_t", t, df) * prior("cauchy", 0, .707), 0)
-
-
-```
 
 [^1]: Something about about *objective* and *subjective*. 

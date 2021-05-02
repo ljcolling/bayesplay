@@ -89,3 +89,8 @@ setMethod("names",
     return(names(x@data))
   }
 )
+
+# constants
+theta <- "\u03F4"
+posterior_labs <-  list(x = theta, y = "Density")
+likelihood_labs <- list(x = theta, y = "Pr(Outcome)")
