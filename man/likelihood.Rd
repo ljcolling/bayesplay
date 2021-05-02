@@ -83,7 +83,7 @@ parameters may be set
 \item \code{n2} the sample size of group 2
 }
 
-\eqn{s_{pooled}}{s_pooled} is set as below:
+\eqn{s_{\mathrm{pooled}}}{s_pooled} is set as below:
 \deqn{s_{\mathrm{pooled}} = \sqrt{\frac{(n_1 - 1)s^2_1 + (n_2 - 1)s^2_2 }{n_1 + n_2 - 2}}}{\sqrt(((n1 - 1) * s1^2 + (n2 - 1)*s2^2)/(n1 + n2 - 2))}
 }
 }
@@ -99,4 +99,7 @@ likelihood(family = "noncentral_t", t = 10, df = 10)
 
 # specify non-central t likelihood (d scaled)
 likelihood(family = "noncentral_d", d = 10, n = 10)
+
+# specify non-central t likelihood (independent samples d scaled)
+likelihood(family = "noncentral_d2", d = 10, n1 = 10, n2 = 12)
 }

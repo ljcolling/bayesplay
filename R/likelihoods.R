@@ -70,7 +70,7 @@ likelihood_data_names <- c("family", "parameters", "likelihood_function")
 #' * \code{n1} the sample size of group 1
 #' * \code{n2} the sample size of group 2
 #'
-#' \eqn{s_{pooled}}{s_pooled} is set as below:
+#' \eqn{s_{\mathrm{pooled}}}{s_pooled} is set as below:
 #' \deqn{s_{\mathrm{pooled}} = \sqrt{\frac{(n_1 - 1)s^2_1 + (n_2 - 1)s^2_2 }{n_1 + n_2 - 2}}}{\sqrt(((n1 - 1) * s1^2 + (n2 - 1)*s2^2)/(n1 + n2 - 2))}
 #'
 #'
@@ -90,6 +90,9 @@ likelihood_data_names <- c("family", "parameters", "likelihood_function")
 #'
 #' # specify non-central t likelihood (d scaled)
 #' likelihood(family = "noncentral_d", d = 10, n = 10)
+#'
+#' # specify non-central t likelihood (independent samples d scaled)
+#' likelihood(family = "noncentral_d2", d = 10, n1 = 10, n2 = 12)
 likelihood <- function(family, ...) {
   if(missing(family)){
     stop("You must specify a `family`")
@@ -187,7 +190,7 @@ student_t_likelihood <- function(mean = 0, sd = 1, df = 0) {
     "Parameters\n",
     "Mean: ", params$mean, "\n",
     "SD: ", params$sd, "\n",
-    "DF:", params$df
+    "DF: ", params$df
   )
 
 
@@ -238,7 +241,7 @@ noncentral_d_likelihood <- function(d, n) {
     "Distribution family: non-central t (d scaled)\n\n",
     "Parameters\n",
     "d: ", params$d, "\n",
-    "N:", params$n
+    "N: ", params$n
   )
 
   # calculate the plot defaults
@@ -289,7 +292,7 @@ noncentral_t_likelihood <- function(t, df) {
     "Distribution family: non-central t (t scaled)\n\n",
     "Parameters\n",
     "d: ", params$t, "\n",
-    "DF:", params$df
+    "DF: ", params$df
   )
 
   d <- t * sqrt(df + 1)
