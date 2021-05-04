@@ -132,15 +132,6 @@ normal_likelihood <- function(mean, sd) { # nolint
 
   params <- list(mean = mean, sd = sd)
 
-  desc <- paste0(
-    "Object of class likelihood\n",
-    "Distribution family: normal\n\n",
-    "Parameters\n",
-    "Mean: ", params$mean, "\n",
-    "SD: ", params$sd
-  )
-
-
   # calculate the plot defaults
   width <- 4 * sd
   range <- c(mean - width, mean + width)
@@ -155,6 +146,8 @@ normal_likelihood <- function(mean, sd) { # nolint
     parameters = as.data.frame(params),
     fun = func
   )
+
+  desc <- describe_likelihood(family = data$family, params = params)
   names(data) <- likelihood_data_names
   new(
     Class = "likelihood",
@@ -184,14 +177,6 @@ student_t_likelihood <- function(mean = 0, sd = 1, df = 0) {
   }
 
   params <- list(mean = mean, sd = sd, df = df)
-  desc <- paste0(
-    "Object of class likelihood\n",
-    "Distribution family: student t\n\n",
-    "Parameters\n",
-    "Mean: ", params$mean, "\n",
-    "SD: ", params$sd, "\n",
-    "DF: ", params$df
-  )
 
 
   # calculate the plot defaults
@@ -208,6 +193,7 @@ student_t_likelihood <- function(mean = 0, sd = 1, df = 0) {
     parameters = as.data.frame(params),
     fun = func
   )
+  desc <- describe_likelihood(family = data$family, params = params)
   names(data) <- likelihood_data_names
   new(
     Class = "likelihood",
@@ -236,13 +222,6 @@ noncentral_d_likelihood <- function(d, n) {
   }
 
   params <- list(d = d, n = n)
-  desc <- paste0(
-    "Object of class likelihood\n",
-    "Distribution family: non-central t (d scaled)\n\n",
-    "Parameters\n",
-    "d: ", params$d, "\n",
-    "N: ", params$n
-  )
 
   # calculate the plot defaults
   variance <- d_variance(d, n - 1)
@@ -261,6 +240,8 @@ noncentral_d_likelihood <- function(d, n) {
     parameters = as.data.frame(params),
     fun = func
   )
+
+  desc <- describe_likelihood(family = data$family, params = params)
   names(data) <- likelihood_data_names
   new(
     Class = "likelihood",
@@ -287,13 +268,6 @@ noncentral_t_likelihood <- function(t, df) {
   }
 
   params <- list(t = t, df = df)
-  desc <- paste0(
-    "Object of class likelihood\n",
-    "Distribution family: non-central t (t scaled)\n\n",
-    "Parameters\n",
-    "d: ", params$t, "\n",
-    "DF: ", params$df
-  )
 
   d <- t * sqrt(df + 1)
   variance <- d_variance(d, df)
@@ -313,6 +287,8 @@ noncentral_t_likelihood <- function(t, df) {
     parameters = as.data.frame(params),
     fun = func
   )
+
+  desc <- describe_likelihood(family = data$family, params = params)
   names(data) <- likelihood_data_names
   new(
     Class = "likelihood",
@@ -335,13 +311,6 @@ noncentral_t_likelihood <- function(t, df) {
 
 binomial_likelihood <- function(successes, trials) {
   params <- list(successes = successes, trials = trials)
-  desc <- paste0(
-    "Object of class likelihood\n",
-    "Distribution family: binomial\n\n",
-    "Parameters\n",
-    "successes: ", params$successes, "\n",
-    "trials: ", params$trials
-  )
 
   # calculate the plot defaults
   range <- c(0, 1)
@@ -356,6 +325,9 @@ binomial_likelihood <- function(successes, trials) {
     parameters = as.data.frame(params),
     fun = func
   )
+
+  desc <- describe_likelihood(family = data$family, params = params)
+
   names(data) <- likelihood_data_names
   new(
     Class = "likelihood",
@@ -384,14 +356,6 @@ noncentral_d2_likelihood <- function(d, n1, n2) {
   }
 
   params <- list(d = d, n1 = n1, n2 = n2)
-  desc <- paste0(
-    "Object of class likelihood\n",
-    "Distribution family: non-central t (independent samples d scaled)\n\n",
-    "Parameters\n",
-    "d: ", params$d, "\n",
-    "N1: ", params$n1, "\n",
-    "N2: ", params$n2
-  )
 
   # calculate the plot defaults
   variance <- d2_variance(d, n1,  n2)
@@ -410,6 +374,8 @@ noncentral_d2_likelihood <- function(d, n1, n2) {
     parameters = as.data.frame(params),
     fun = func
   )
+
+  desc <- describe_likelihood(family = data$family, params = params)
   names(data) <- likelihood_data_names
   new(
     Class = "likelihood",

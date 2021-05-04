@@ -7,13 +7,13 @@
 integral(obj)
 }
 \arguments{
-\item{obj}{a \code{predictive} object}
+\item{obj}{a \code{product} object}
 }
 \value{
-A numeric of the point predictive value
+A numeric of the marginal likelihood
 }
 \description{
-Computes the definite integral of a \code{predictive} object over the range
+Computes the definite integral of a \code{product} object over the range
 of the parameter
 }
 \examples{

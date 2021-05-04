@@ -24,5 +24,4 @@ Imports:
     purrr,
     methods,
     rlang,
-    zeallot,
     gginnards

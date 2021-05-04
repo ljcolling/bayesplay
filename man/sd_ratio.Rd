@@ -7,7 +7,7 @@
 sd_ratio(x, point)
 }
 \arguments{
-\item{x}{a \code{predictive} object}
+\item{x}{a \code{posterior} object}
 
 \item{point}{a point at which to evaluate the Savage-Dickey ratio}
 }
@@ -15,7 +15,7 @@ sd_ratio(x, point)
 A numeric of the Savage-Dickey density ratio
 }
 \description{
-Computes the Saveage-Dickey density ratio on a \code{predictive} object
+Computes the Saveage-Dickey density ratio from a \code{posterior} object
 at a specified point
 }
 \examples{

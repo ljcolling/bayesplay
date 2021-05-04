@@ -1,10 +1,10 @@
-context("Prior distributions")
+context("Prior familys")
 test_that("specifying priors", {
 
-  skip("skip")
+  # skip("skip")
   tol <- 0.0000005
   half_norm <- prior(
-    distribution = "normal",
+    family = "normal",
     mean = 0,
     sd = 10,
     range = c(0, Inf)
@@ -24,7 +24,7 @@ test_that("specifying priors", {
 
 
   half_t <- prior(
-    distribution = "student_t",
+    family = "student_t",
     mean = 0,
     sd = 1,
     df = 10,
@@ -44,7 +44,7 @@ test_that("specifying priors", {
   )
 
   cauchy_prior <- prior(
-    distribution = "cauchy",
+    family = "cauchy",
     scale = 1
   )
 
@@ -55,7 +55,7 @@ test_that("specifying priors", {
   )
 
   cauchy_prior <- prior(
-    distribution = "cauchy",
+    family = "cauchy",
     location = 2,
     scale = 2
   )
@@ -67,7 +67,7 @@ test_that("specifying priors", {
   )
 
   half_cauchy <- prior(
-    distribution = "cauchy",
+    family = "cauchy",
     location = 0,
     scale = 1,
     range = c(0, Inf)

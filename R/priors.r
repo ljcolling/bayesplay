@@ -122,7 +122,7 @@ normal_prior <- function(mean, sd, range) {
 
   desc <- paste0(
     "Object of class prior\n",
-    "Distribution family: normal\n\n",
+    "Distribution family: normal\n",
     "Parameters\n",
     "Mean: ", params$mean, "\n",
     "SD: ", params$sd, "\n",
@@ -166,7 +166,7 @@ point_prior <- function(range, point = 0) {
 
   desc <- paste0(
     "Object of class prior\n",
-    "Distribution family: point\n\n",
+    "Distribution family: point\n",
     "Parameters\n",
     "point: ", params$point
   )
@@ -207,7 +207,7 @@ uniform_prior <- function(min, max, range) {
 
   desc <- paste0(
     "Object of class prior\n",
-    "Distribution family: uniform\n\n",
+    "Distribution family: uniform\n",
     "Parameters\n",
     "Min: ", params$min, "\n",
     "Max: ", params$max
@@ -279,7 +279,7 @@ student_t_prior <- function(mean, sd, df, range) {
 
   desc <- paste0(
     "Object of class prior\n",
-    "Distribution family: student t\n\n",
+    "Distribution family: student t\n",
     "Parameters\n",
     "Mean: ", mean, "\n",
     "SD: ", sd, "\n",
@@ -345,7 +345,7 @@ cauchy_prior <- function(location = 0, scale, range) {
 
   desc <- paste0(
     "Object of class prior\n",
-    "Distribution family: cauchy\n\n",
+    "Distribution family: cauchy\n",
     "Parameters\n",
     "Location: ", location, "\n",
     "Scale: ", scale, "\n",
@@ -400,7 +400,7 @@ beta_prior <- function(alpha, beta, range) {
 
   desc <- paste0(
     "Object of class prior\n",
-    "Distribution family: beta\n\n",
+    "Distribution family: beta\n",
     "Parameters\n",
     "Alpha: ", params$alpha, "\n",
     "Beta: ", params$alpha

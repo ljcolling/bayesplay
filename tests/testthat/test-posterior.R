@@ -1,9 +1,9 @@
-context("Posterior distributions")
+context("Posterior familys")
 test_that("posterior", {
 
-  skip("skip")
-  likelihood_obj <- likelihood(distribution = "noncentral_d", 0.7, df = 15)
-  prior_obj <- prior(distribution = "cauchy", 0, 10)
+  # skip("skip")
+  likelihood_obj <- likelihood(family = "noncentral_d", 0.7, n = 15)
+  prior_obj <- prior(family = "cauchy", 0, 10)
   posterior_obj <- likelihood_obj * prior_obj
 
   h1 <- integral(likelihood_obj * prior_obj)
@@ -29,8 +29,8 @@ test_that("posterior", {
   )
 
   # test with a half cauchy prior
-  likelihood_obj <- likelihood(distribution = "noncentral_d", 0.7, df = 15)
-  prior_obj <- prior(distribution = "cauchy", 0, 10, range = c(0, Inf))
+  likelihood_obj <- likelihood(family = "noncentral_d", 0.7, n = 15)
+  prior_obj <- prior(family = "cauchy", 0, 10, range = c(0, Inf))
   posterior_obj <- likelihood_obj * prior_obj
 
   h1 <- integral(likelihood_obj * prior_obj)
@@ -42,13 +42,13 @@ test_that("posterior", {
 
 
 
-  likelihood_obj <- likelihood(distribution = "noncentral_d", 0.7, df = 15)
-  prior_obj <- prior(distribution = "cauchy", 0, 10, range = c(0, Inf))
+  likelihood_obj <- likelihood(family = "noncentral_d", 0.7, n = 15)
+  prior_obj <- prior(family = "cauchy", 0, 10, range = c(0, Inf))
   posterior_obj_half <- likelihood_obj * prior_obj
 
 
-  likelihood_obj <- likelihood(distribution = "noncentral_d", 0.7, df = 15)
-  prior_obj <- prior(distribution = "cauchy", 0, 10, range = c(-Inf, Inf))
+  likelihood_obj <- likelihood(family = "noncentral_d", 0.7, n = 15)
+  prior_obj <- prior(family = "cauchy", 0, 10, range = c(-Inf, Inf))
   posterior_obj_full <- likelihood_obj * prior_obj
 
   full <- posterior_obj_full$prediction_function(0.7)

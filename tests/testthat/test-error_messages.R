@@ -35,8 +35,8 @@ test_that("error messages", {
 
   #   expect_error(prior("cauchy"),
   # "You must specify `location` and `scale` for a cauchy  prior")
-  data <- likelihood(distribution = "binomial", 2, 10)
-  m0 <- data * prior(distribution = "beta", 10, 10)
+  data <- likelihood(family = "binomial", 2, 10)
+  m0 <- data * prior(family = "beta", 10, 10)
   m1 <- data * prior("point", 0.5)
   expect_error(
     visual_compare(m0, m1, type = "null"),

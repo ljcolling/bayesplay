@@ -15,8 +15,6 @@ in_range <- function(x, range) {
 }
 
 
-`%<-%` <- zeallot::`%<-%` # nolint
-
 integer_breaks <- function(n = 5, ...) {
   fxn <- function(x) {
     breaks <- floor(pretty(x, n, ...))
@@ -224,7 +222,7 @@ make_distribution <- function(dist_name, params) {
   )
 
   desc <- paste0(
-    "Object of class predictive\n",
+    "Object of class product\n",
     "Likelihood family: ", likelihood$family, "\n",
     "Prior family: ", prior$family, "\n\n",
     "Area under curve: ", round(data$integral, 4)
@@ -232,7 +230,7 @@ make_distribution <- function(dist_name, params) {
 
 
   new(
-    Class = "predictive",
+    Class = "product",
     desc = desc,
     data = data,
     K = k,
@@ -250,7 +248,7 @@ make_distribution <- function(dist_name, params) {
 
 
 
-`/.predictive` <- function(e1, e2) {
+`/.product` <- function(e1, e2) {
   bf <- e1@data$integral / e2@data$integral
   return(bf)
 }
@@ -264,12 +262,12 @@ bf <- setClass("bf", contains = "numeric")
 
 #' Compute integral
 #'
-#' Computes the definite integral of a \code{predictive} object over the range
+#' Computes the definite integral of a \code{product} object over the range
 #' of the parameter
 #'
-#' @param obj a \code{predictive} object
+#' @param obj a \code{product} object
 #'
-#' @return A numeric of the point predictive value
+#' @return A numeric of the marginal likelihood
 #' @export
 #'
 #' @examples
@@ -284,7 +282,7 @@ bf <- setClass("bf", contains = "numeric")
 #' # take the integral
 #' integral(model)
 integral <- function(obj) {
-  if (class(obj) == "predictive") {
+  if (class(obj) == "product") {
     return(new("auc", obj$integral))
   } else if (class(obj) == "likelihood") {
     return(stats::integrate(obj@func, -Inf, Inf)$value)
@@ -370,8 +368,7 @@ make_predict <- function(data_model, prior_model) {
 
 calc_posterior <- function(likelihood, prior) {
   make_posterior <- function(likelihood, prior, theta) {
-    k <- bayesplay::integral(likelihood * prior)
-
+    k <- (likelihood * prior)$integral
     prior_func <- prior@func
     likelihood_func <- likelihood@func
 
@@ -421,10 +418,10 @@ calc_ratio <- function(likelihood, prior) {
 
 #' Compute the Savage-Dickey density ratio
 #'
-#' Computes the Saveage-Dickey density ratio on a \code{predictive} object
+#' Computes the Saveage-Dickey density ratio from a \code{posterior} object
 #' at a specified point
 #'
-#' @param x a \code{predictive} object
+#' @param x a \code{posterior} object
 #' @param point a point at which to evaluate the Savage-Dickey ratio
 #'
 #' @return A numeric of the Savage-Dickey density ratio

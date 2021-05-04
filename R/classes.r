@@ -38,8 +38,8 @@ likelihood <- setClass(
 
 #' @noRd
 #' @export
-predictive <- setClass(
-  Class = "predictive",
+product <- setClass(
+  Class = "product",
   slots = list(
     data = "list",
     desc = "character",
@@ -53,7 +53,44 @@ predictive <- setClass(
 )
 
 
-setClassUnion("bayesplay", c("likelihood", "prior", "predictive"))
+#' @noRd
+#' @export
+posterior <- setClass(
+  Class = "posterior",
+  slots = list(
+    data = "list",
+    desc = "character",
+    K = "numeric",
+    lik = "function",
+    prior = "function",
+    theta_range = "numeric",
+    likelihood_obj = "likelihood",
+    prior_obj = "prior"
+  )
+)
+
+#' @noRd
+#' @export
+prediction <- setClass(
+  Class = "prediction",
+  slots = list(
+    data = "list",
+    desc = "character",
+    K = "numeric",
+    lik = "function",
+    prior = "function",
+    theta_range = "numeric",
+    likelihood_obj = "likelihood",
+    prior_obj = "prior"
+  )
+)
+
+
+setClassUnion("bayesplay", c("likelihood",
+                             "prior",
+                             "product",
+                             "posterior", 
+                             "prediction"))
 
 #' Summary for an object of class \code{bayesplay}
 #' @noRd
@@ -94,3 +131,4 @@ setMethod("names",
 theta <- "\u03F4"
 posterior_labs <-  list(x = theta, y = "Density")
 likelihood_labs <- list(x = theta, y = "Pr(Outcome)")
+

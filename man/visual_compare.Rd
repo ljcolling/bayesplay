@@ -4,7 +4,7 @@
 \alias{visual_compare}
 \title{Visually compare two models}
 \usage{
-visual_compare(model1, model2, n = 101, type = "compare")
+visual_compare(model1, model2, type = "compare")
 }
 \arguments{
 \item{model1}{a \code{predictive} object}
