@@ -30,7 +30,6 @@ make_distribution <- function(dist_name, params) {
 
   eval2 <- function(x) {
     eval(parse(text = x))
-
   }
 
   # add x = theta if it's missing
@@ -161,8 +160,8 @@ make_distribution <- function(dist_name, params) {
   return(eval2(return_func))
 }
 
-#make_distribution(dist_name = "non_central_t_dist", params = list(df = 10, t = 2.5, x = "theta"))
-#make_distribution(dist_name = "non_central_d_dist", params = list(n = 10, d = 2.5, x = "theta"))
+# make_distribution(dist_name = "non_central_t_dist", params = list(df = 10, t = 2.5, x = "theta"))
+# make_distribution(dist_name = "non_central_d_dist", params = list(n = 10, d = 2.5, x = "theta"))
 
 
 #' @importFrom methods new
@@ -185,40 +184,41 @@ make_distribution <- function(dist_name, params) {
   likelihood_func <- likelihood@func
   prior_func <- prior@func
 
-  # normalise the pior
-  k <- 1 # can delete this
+  product_function <- function(x) likelihood_func(x) * prior_func(x)
 
-  posterior_func <- calc_posterior(likelihood, prior)
-
-  marginal <- calc_marginal(likelihood, prior)
-
+  # for priors that non-point points
   if (theta_range[1] != theta_range[2]) {
-    alt_val <- suppressWarnings(stats::integrate(
-      marginal,
+    marginal_likelihood <- suppressWarnings(stats::integrate(
+      Vectorize(product_function),
       theta_range[1],
       theta_range[2]
     )$value)
-  } else {
-    alt_val <- marginal(theta_range[[1]])
   }
+
+
+  # for point priors
+  if (theta_range[1] == theta_range[2]) {
+    marginal_likelihood <- product_function(theta_range[1])
+  }
+
+  posterior_func <- function(x) product_function(x) / marginal_likelihood
 
   evidence_func <- function(x) posterior_func(x) / prior_func(x)
 
   marginal_func <- function(x) likelihood_func(x) / evidence_func(x)
 
-  conditional_func <- function(x) evidence_func(x) * marginal_func(x)
+  conditional_func <- function(x) evidence_func(x) * product_function(x)
 
 
 
   data <- list(
-    integral = alt_val,
+    integral = marginal_likelihood,
     marginal_function = marginal_func,
     evidence_function = evidence_func,
     posterior_function = posterior_func,
     conditional_function = conditional_func,
-    weighted_likelihood_function = marginal,
-    prediction_function = make_predict(likelihood, prior),
-    prior.normalising.constant = k
+    weighted_likelihood_function = product_function,
+    prediction_function = make_predict(likelihood, prior)
   )
 
   desc <- paste0(
@@ -233,7 +233,7 @@ make_distribution <- function(dist_name, params) {
     Class = "product",
     desc = desc,
     data = data,
-    K = k,
+    K = 1,
     lik = likelihood_func,
     prior = prior_func,
     theta_range = theta_range,
@@ -358,7 +358,7 @@ make_predict <- function(data_model, prior_model) {
   g <- glue::glue
 
   marginal <- data_model@marginal # nolint
-  marginal_func <- eval(parse(text = g("function(x) {marginal}"))) # nolint
+  marginal_func <- function(x) eval(parse(text = marginal))
 
   predictive_func <- function(x) integral(marginal_func(x) * prior_model)
 

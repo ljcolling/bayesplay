@@ -1,6 +1,5 @@
 context("Error messages")
 test_that("error messages", {
-
   skip("skip")
 
   # missing parameters

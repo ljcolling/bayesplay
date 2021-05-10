@@ -1,20 +1,22 @@
 #' Plot a bayesplay object
 #' @description Plots an object created by bayesplay
-#' @param x a \code{likelihood}, \code{prior}, \code{posterior}, \code{product} or \code{predictive} object
+#' @param x a \code{likelihood}, \code{prior}, \code{posterior}, \code{product}
+#' or \code{predictive} object
 setGeneric("plot",
-function(x, ...) standardGeneric("plot"), signature = c("x")
+  function(x, ...) standardGeneric("plot"),
+  signature = c("x")
 )
 
 setMethod("plot", "prior", function(x) {
-            plot.prior(x)
+  plot.prior(x)
 })
 
 setMethod("plot", "posterior", function(x, add_prior = FALSE) {
-            plot.posterior(x, add_prior)
+  plot.posterior(x, add_prior)
 })
 
 setMethod("plot", "likelihood", function(x) {
-            plot.likelihood(x)
+  plot.likelihood(x)
 })
 
 
@@ -22,14 +24,14 @@ setMethod("plot", "likelihood", function(x) {
 #' @rdname plot
 #' @export
 plot.prior <- function(x) {
-  return(handle_prior_likelihood(x, n = 101)) # TODO: have seperate plot_prior and
+  return(handle_prior_likelihood(x, n = 101))
 }
 
 #' @method plot likelihood
 #' @rdname plot
 #' @export
 plot.likelihood <- function(x) {
-  return(handle_prior_likelihood(x, n = 101)) # TODO: have seperate plot_prior and
+  return(handle_prior_likelihood(x, n = 101))
 }
 
 #' @method plot posterior
@@ -54,13 +56,12 @@ plot.product <- function(x) {
 #' @rdname plot
 #' @export
 plot.prediction <- function(x) {
-  model_name <- paste0(substitute(x))
-  return(plot_prediction(x, n = 101, model_name))
+  return(plot_prediction(x, n = 101))
 }
 
 
 
-plot_prediction <- function(x, n, model_name) {
+plot_prediction <- function(x, n, model_name = "model") {
   likelihood_obj <- x@likelihood_obj
   likelihood_family <- likelihood_obj$family
 
@@ -76,7 +77,7 @@ plot_prediction <- function(x, n, model_name) {
 
 handle_binomial_marginal <- function(x, n, model_name) {
   model_func <- x$prediction_function
-  plot_range <- c(0, x@likelihood_obj$parameters$trials)
+  plot_range <- c(0, get_binomial_trials(x))
   observation <- x@likelihood_obj@observation
 
   observation_df <- data.frame(
@@ -122,9 +123,23 @@ handle_binomial_marginal <- function(x, n, model_name) {
     NULL
 }
 
+is_binomial <- function(x) {
+  x@likelihood_obj$family == "binomial"
+}
+
+get_binomial_trials <- function(x) {
+  x@likelihood_obj$parameters$trials
+}
+
+
 get_max_range <- function(x) {
   pr <- x@prior_obj@plot$range
   lk <- x@likelihood_obj@plot$range
+
+  if (is_binomial(x)) {
+    return(c(0, get_binomial_trials(x)))
+  }
+
   min_value <- min(c(pr, lk))
   max_value <- max(c(pr, lk))
   return(c(min_value, max_value))
@@ -180,9 +195,6 @@ marginal_probability <- function(model1, n = 101) {
   if (likelihood_family == "binomial") {
     plot_range <- c(0, model1@likelihood_obj$parameters$trials)
 
-    observation <- likelihood_obj@observation
-
-
 
     observation_range <- seq(plot_range[1], plot_range[2], 1)
 
@@ -235,21 +247,21 @@ plot_point <- function(x, n) {
     )) +
     ggplot2::xlim(x@plot$range) +
     ggplot2::labs(x = x@plot$labs$x, y = x@plot$labs$y) +
-    # ggplot2::theme_minimal(base_size = 16) +
+    ggplot2::expand_limits(y = 0) +
     NULL)
 }
 
 plot_continuous <- function(x, n) {
   return(ggplot2::ggplot() +
     ggplot2::geom_function(
-      fun = x@func,
+      fun = Vectorize(x@func),
       colour = "black",
       na.rm = TRUE,
       n = n
     ) +
     ggplot2::xlim(x@plot$range) +
     ggplot2::labs(x = x@plot$labs$x, y = x@plot$labs$y) +
-    # ggplot2::theme_minimal(base_size = 16) +
+    ggplot2::expand_limits(y = 0) +
     NULL)
 }
 
@@ -263,13 +275,12 @@ plot_discrete <- function(x, n) {
     ggplot2::geom_line() +
     ggplot2::xlim(x@plot$range) +
     ggplot2::labs(x = x@plot$labs$x, y = x@plot$labs$y) +
-    # ggplot2::theme_minimal(base_size = 12) +
+    ggplot2::expand_limits(y = 0) +
     NULL)
 }
 
 plot_weighted_likelihood <- function(x, n) {
   func <- x$weighted_likelihood_function
-  # func <- x$conditional_function
   plot_range <- x@prior_obj@plot$range
 
   if (x@likelihood_obj$family == "binomial") {
@@ -387,5 +398,3 @@ visual_compare <- function(model1, model2, type = "compare") {
       )
   }
 }
-
-

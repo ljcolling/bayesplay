@@ -1,6 +1,7 @@
 
 get_function <- function(x) x@fun
 get_family <- function(x) x@family
+get_default_range <- function(x) x@default_range
 
 make_likelihood_data <- function(family, params, func) {
   list(
@@ -21,94 +22,6 @@ dt_scaled <- function(x, df, mean = 0, sd = 1, ncp = 0, log = FALSE) {
   }
 }
 
-#' @export
-setClass(
-  Class = "normal",
-  list(family = "character", fun = "function"),
-  prototype = list(
-    family = "normal",
-    fun = function(x, mean, sd) {
-      dnorm(x = mean, mean = x, sd = sd)
-    }
-  )
-)
-
-
-#' @export
-setClass(
-  Class = "student_t",
-  list(family = "character", fun = "function"),
-  prototype = list(
-    family = "student_t",
-    fun = function(x, mean, sd, df) {
-      dt_scaled(x = mean, mean = x, sd = sd, df = df)
-    }
-  )
-)
-
-
-#' @export
-setClass(
-  Class = "noncentral_t",
-  list(family = "character", fun = "function"),
-  prototype = list(
-    family = "noncentral_t",
-    fun = function(x, t, df) {
-      dt(x = t, df = df, ncp = x)
-    }
-  )
-)
-
-
-#' @export
-setClass(
-  Class = "noncentral_d",
-  list(family = "character", fun = "function"),
-  prototype = list(
-    family = "noncentral_d",
-    fun = function(x, d, n) {
-      dt(x = d * sqrt(n), df = n - 1, ncp = x * sqrt(n))
-    }
-  )
-)
-
-setClass(
-  Class = "noncentral_d2",
-  list(family = "character", fun = "function"),
-  prototype = list(
-    family = "noncentral_d2",
-    fun = function(x, d, n1, n2) {
-      dt(
-        x = d / sqrt(1 / n1 + 1 / n2),
-        df = n1 + n2 - 2,
-        ncp = x * sqrt((n1 * n2) / (n1 + n2))
-      )
-    }
-  )
-)
-
-setClass(
-  Class = "binomial",
-  list(family = "character", fun = "function"),
-  prototype = list(
-    family = "binomial",
-    fun = function(p, successes, trials) {
-      dbinom(prob = p, size = trials, x = successes)
-    }
-  )
-)
-
-
-
-setClassUnion(
-  "family",
-  c("normal",
-    "student_t",
-    "noncentral_t",
-    "noncentral_d",
-    "noncentral_d2",
-    "binomial")
-)
 
 
 d_variance <- function(d, df) {
@@ -468,8 +381,7 @@ make_likelihood.binomial <- function(family, successes, trials) {
     func = func,
     data = data,
     marginal = paste0(
-      "likelihood(family = \"binomial\", successes = ",
-      successes, ", trials =  trials)"
+      "likelihood(family = \"binomial\", successes = x, trials = ", trials, ")"
     ),
     observation = params$successes,
     desc = desc,
@@ -510,7 +422,7 @@ make_likelihood.noncentral_d2 <- function(family, d, n1, n2) {
     data = data,
     func = func,
     marginal = paste0(
-      "likelihood(family = \"noncentral_d2\", d = x,  n1 = ",
+      "likelihood(family = \"noncentral_d2\", d = observation,  n1 = ",
       n1, ", n2 = ", n2, ")"
     ),
     observation = params$d,
@@ -520,4 +432,4 @@ make_likelihood.noncentral_d2 <- function(family, d, n1, n2) {
       labs = likelihood_labs
     )
   )
-}}
+}

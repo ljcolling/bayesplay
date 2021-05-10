@@ -98,14 +98,16 @@ test_that("basic BF calculations", {
 
   testthat::expect_equal(bf_bayesfactor,
     unclass(bf),
-    tolerance = tol, scale = 1)
+    tolerance = tol, scale = 1
+  )
 
   data_model <- likelihood(family = "noncentral_d", d, n = n)
   prior_model <- prior(family = "cauchy", 0, 1)
   bf <- sd_ratio(data_model * prior_model, 0)
   testthat::expect_equal(bf_bayesfactor,
     unclass(bf),
-    tolerance = tol, scale = 1)
+    tolerance = tol, scale = 1
+  )
 
 
   # independent samples
@@ -129,16 +131,18 @@ test_that("basic BF calculations", {
 
   testthat::expect_equal(bf_bayesfactor,
     unclass(bf),
-    tolerance = tol, scale = 1)
+    tolerance = tol, scale = 1
+  )
 
 
-  data_model <- likelihood("noncentral_d2", d = d,  n1 = n1, n2 = n2)
+  data_model <- likelihood("noncentral_d2", d = d, n1 = n1, n2 = n2)
   prior_model <- prior("cauchy", 0, 1)
   bf <- bayesplay::sd_ratio(data_model * prior_model, 0)
 
   testthat::expect_equal(bf_bayesfactor,
     unclass(bf),
-    tolerance = tol, scale = 1)
+    tolerance = tol, scale = 1
+  )
 
   t <- 2.03
   n <- 80
@@ -254,6 +258,4 @@ test_that("basic BF calculations", {
     label = "binomial likelihood, beta prior",
     tolerance = tol, scale = 1
   )
-
-
 })

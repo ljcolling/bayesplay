@@ -57,79 +57,102 @@ prior_data_names <- c("family", "parameters", "prior_function")
 #' # specify a point prior
 #' prior(family = "point", point = 0)
 prior <- function(family, ...) {
-  if (!methods::existsFunction(signature = family, f = "make_prior")) {
+  if (!methods::existsMethod(signature = family, f = "make_prior")) {
     stop(family, " is not a valid distribution family")
-  } 
+  }
   make_prior(family = new(family), ...)
 }
 
 
+setGeneric("make_prior",
+  signature = "family",
+  function(family, ...) UseMethod("make_prior")
+)
 
-# DELETE BELOW HERE
-# # prior <- function(family, ...) {
-# #   parameters <- as.list(match.call(expand.dots = TRUE))
-# # 
-# # 
-# #   # set the default range of support
-# #   if (parameters$family == "beta") {
-# #     default_range <- c(0, 1)
-# #   } else {
-# #     default_range <- c(-Inf, Inf)
-# #   }
-# # 
-# #   range <- parameters$range %||% default_range # nolint
-# # 
-# # 
-# # 
-# #   # prior function needs parameters for
-# #   # family - normal, student_t, beta, cauchy, uniform, point
-# #   # parameters - parameters for the distributions
-# #   # range_of_support :: for one tailed etc
-# # 
-# #   family <- paste0(parameters$family %||%
-# #     "uniform", "_prior")
-# # 
-# #   lik_fun <- purrr::partial(
-# #     .f = rlang::as_function(family),
-# #     range = range, ...
-# #   )
-# # 
-# #   return(lik_fun())
-# # }
-# # 
-# DELETE ABOVE HERE
 
-# function that specifies a normal prior
-# working on for ./R/plotting.R
-normal_prior <- function(mean, sd, range) {
+
+setMethod(
+  "make_prior",
+  signature(family = "normal"),
+  function(family, mean, sd, ...) {
+    make_prior.normal(family, mean, sd, ...)
+  }
+)
+
+setMethod(
+  "make_prior",
+  signature(family = "point"),
+  function(family, point = 0) {
+    make_prior.point(family, point)
+  }
+)
+
+
+setMethod(
+  "make_prior",
+  signature(family = "uniform"),
+  function(family, min, max) {
+    make_prior.uniform(family, min, max)
+  }
+)
+
+setMethod(
+  "make_prior",
+  signature(family = "student_t"),
+  function(family, mean, sd, df, ...) {
+    make_prior.student_t(family, mean, sd, df, ...)
+  }
+)
+
+
+setMethod(
+  "make_prior",
+  signature(family = "cauchy"),
+  function(family, location = 0, scale, ...) {
+    make_prior.cauchy(family, location, scale, ...)
+  }
+)
+
+
+setMethod(
+  "make_prior",
+  signature(family = "beta"),
+  function(family, alpha, beta, ...) {
+    make_prior.beta(family, alpha, beta, ...)
+  }
+)
+
+truncate_normalise <- function(family, range, ...) {
+  unnormalised <- function(x) get_function(family)(x = x, ...)
+
+  truncated_function <- function(x) ifelse(in_range(x, range), unnormalised(x), 0)
+  constant <- 1 / integrate(Vectorize(truncated_function), range[1], range[2])$value
+
+  normalised <- function(x) truncated_function(x) * constant
+  return(normalised)
+}
+
+
+#' @method prior normal
+#' @usage prior(family = "normal", mean, sd, range)
+#' @rdname prior
+make_prior.normal <- function(family, mean, sd, range = NULL) {
   if (missing(mean) | missing(sd)) {
     stop("You must specify `mean` and `sd` for a normal prior", call. = FALSE)
   }
 
-  func <- make_distribution("norm_dist", list(mean = mean, sd = sd)) # nolint
-  # normalise the pior
-  # get the normalising factor
-  # if (range[1] != range[2]) {
-  k <- 1 / stats::integrate(
-    f = func,
-    lower = range[1],
-    upper = range[2]
-  )$value
+  if (sd <= 0) {
+    stop("`sd` must be greater than 0")
+  }
 
-  if (k != 1) {
-    func <- make_distribution(
-      "half_norm",
-      list(
-        range = range,
-        mean = mean,
-        sd = sd,
-        k = k
-      )
-    )
+  if (missing(range)) {
+    range <- get_default_range(family)
   }
 
 
   params <- list(mean = mean, sd = sd, range = range)
+
+  func <- truncate_normalise(family = family, range = range, mean = mean, sd = sd)
 
   desc <- paste0(
     "Object of class prior\n",
@@ -145,6 +168,7 @@ normal_prior <- function(mean, sd, range) {
     parameters = as.data.frame(params),
     fun = Vectorize(func)
   )
+
   names(data) <- prior_data_names
 
   new(
@@ -152,7 +176,7 @@ normal_prior <- function(mean, sd, range) {
     data = data,
     theta_range = range,
     type = "normal",
-    func = Vectorize(func),
+    func = func,
     desc = desc,
     dist_type = "continuous",
     plot = list(
@@ -164,17 +188,18 @@ normal_prior <- function(mean, sd, range) {
   )
 }
 
-
-# function that specifies a point prior
-point_prior <- function(range, point = 0) {
+#' @method prior point
+#' @usage prior(family = "point", point)
+#' @rdname prior
+make_prior.point <- function(family, point = 0) {
   if (missing(point)) {
     warning("Point value is missing. Assuming 0", call. = FALSE)
   }
+  func <- function(x) get_function(family)(x = x, point = point)
   width <- 4
   range <- c(point - width, point + width)
   params <- list(point = point)
-  func <- make_distribution("point", list(point = point)) # nolint
-
+  # func <- make_distribution("point", list(point = point)) # nolint
   desc <- paste0(
     "Object of class prior\n",
     "Distribution family: point\n",
@@ -206,14 +231,17 @@ point_prior <- function(range, point = 0) {
 }
 
 
-# function that specifies a uniform prior
-uniform_prior <- function(min, max, range) {
+
+#' @method prior uniform
+#' @usage prior(family = "uniform", min, max)
+#' @rdname prior
+make_prior.uniform <- function(family, min, max) {
   if (missing(min) | missing(max)) {
     stop("You must specify `min` and `max` for a uniform  prior", call. = FALSE)
   }
 
 
-  func <- make_distribution("uni_dist", list(min = min, max = max)) # nolint
+  func <- function(x) get_function(family)(x = x, min = min, max = max)
   params <- list(min = min, max = max)
 
   desc <- paste0(
@@ -252,41 +280,25 @@ uniform_prior <- function(min, max, range) {
   )
 }
 
-# function that specifies a student_t prior
-student_t_prior <- function(mean, sd, df, range) {
+
+
+#' @method prior student_t
+#' @usage prior(family = "student_t", mean, sd, df, range)
+#' @rdname prior
+make_prior.student_t <- function(family, mean, sd, df, range = NULL) {
   if (missing(mean) | missing(sd) | missing(df)) {
     stop("You must specify `mean`, `sd`, and `df` for a student_t prior",
       call. = FALSE
     )
   }
 
-
-  func <- make_distribution(
-    "t_dist",
-    list(mean = mean, sd = sd, df = df, ncp = 0)
-  )
-  # normalise the pior
-  # get the normalising factor
-  # if (range[1] != range[2]) {
-  k <- 1 / stats::integrate(
-    f = func,
-    lower = range[1],
-    upper = range[2]
-  )$value
-
-  if (k != 1) {
-    func <- make_distribution(
-      "half_t",
-      list(
-        range = range,
-        mean = mean,
-        sd = sd,
-        df = df,
-        ncp = 0,
-        k = k
-      )
-    )
+  if (missing(range)) {
+    range <- get_default_range(family)
   }
+
+  func <- truncate_normalise(family = family, range = range, mean = mean, sd = sd, df = df)
+
+
 
   desc <- paste0(
     "Object of class prior\n",
@@ -312,7 +324,7 @@ student_t_prior <- function(mean, sd, df, range) {
     Class = "prior",
     data = data,
     theta_range = range,
-    func = Vectorize(func),
+    func = func,
     type = "normal",
     desc = desc,
     dist_type = "continuous",
@@ -325,34 +337,15 @@ student_t_prior <- function(mean, sd, df, range) {
   )
 }
 
-cauchy_prior <- function(location = 0, scale, range) {
-
-  # an error message belongs here
-
-  func <- make_distribution(
-    "cauchy_dist",
-    list(location = location, scale = scale)
-  )
-  # normalise the pior
-  # get the normalising factor
-  # if (range[1] != range[2]) {
-  k <- 1 / stats::integrate(
-    f = func,
-    lower = range[1],
-    upper = range[2]
-  )$value
-
-  if (k != 1) {
-    func <- make_distribution(
-      "half_cauchy",
-      list(
-        range = range,
-        location = location,
-        scale = scale,
-        k = k
-      )
-    )
+#' @method prior cauchy
+#' @usage prior(family = "cauchy", location, scale, range)
+#' @rdname prior
+make_prior.cauchy <- function(family, location = 0, scale, range = NULL) {
+  if (missing(range)) {
+    range <- get_default_range(family)
   }
+
+  func <- truncate_normalise(family = family, range = range, location = location, scale = scale)
 
   desc <- paste0(
     "Object of class prior\n",
@@ -372,13 +365,13 @@ cauchy_prior <- function(location = 0, scale, range) {
   )
 
   names(data) <- prior_data_names
-  
+
 
   new(
     Class = "prior",
     data = data,
     theta_range = range,
-    func = Vectorize(func),
+    func = func,
     type = "normal",
     desc = desc,
     dist_type = "continuous",
@@ -398,15 +391,21 @@ cauchy_prior <- function(location = 0, scale, range) {
   )
 }
 
-# function that specifies a beta prior
-beta_prior <- function(alpha, beta, range) {
+#' @method prior beta
+#' @usage prior(family = "beta", alpha, beta)
+#' @rdname prior
+make_prior.beta <- function(family, alpha, beta, range = NULL) {
   range <- c(0, 1)
   if (missing(alpha) | missing(beta)) {
     stop("You must specify `alpha` and `beta` for a beta  prior", call. = FALSE)
   }
 
+  if (missing(range)) {
+    range <- get_default_range(family)
+  }
 
-  func <- make_distribution("beta_dist", list(alpha = alpha, beta = beta)) # nolint
+
+  func <- truncate_normalise(family = family, range = range, beta = beta, alpha = alpha)
   params <- list(alpha = alpha, beta = beta)
 
   desc <- paste0(

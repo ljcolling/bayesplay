@@ -35,7 +35,7 @@ extract_posterior <- function(x) {
   )
 }
 
-#' Extract predictions 
+#' Extract predictions
 #' @export
 extract_predictions <- function(x) {
   if (class(x) != "product") {

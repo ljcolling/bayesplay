@@ -22,7 +22,8 @@ plot(x, ...)
 \method{plot}{prediction}(x)
 }
 \arguments{
-\item{x}{a \code{likelihood}, \code{prior}, \code{posterior}, \code{product} or \code{predictive} object}
+\item{x}{a \code{likelihood}, \code{prior}, \code{posterior}, \code{product}
+or \code{predictive} object}
 
 \item{add_prior}{set to TRUE to add prior to the posterior plot}
 }

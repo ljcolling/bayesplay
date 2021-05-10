@@ -30,7 +30,7 @@ To plot a likelihood, you first need to define a likelihood using the standard s
 In the example below, we define normal likelihood with a mean of 5.5 and a standard error of 32.35.
 
 ```{r}
-norm_mod <- likelihood(distribution = "normal", mean = 5.5, sd = 32.35)
+norm_mod <- likelihood(family = "normal", mean = 5.5, sd = 32.35)
 norm_mod
 ```
 
@@ -45,7 +45,7 @@ As shown above, default axis labels are applied to the x and y axis. The x-axis 
 An identical approach can also be used for plotting *t* likelihoods. First we define the likelihood.
 
 ```{r}
-t_mod <- likelihood(distribution = "student_t", mean = 10, sd = 5, df = 15)
+t_mod <- likelihood(family = "student_t", mean = 10, sd = 5, df = 15)
 t_mod
 ```
 
@@ -63,28 +63,28 @@ The process for plotting priors is identical to plotting likelihoods. First we d
 For example, we can plot a point prior, typically used for a null model. 
 
 ```{r}
-point_prior <- prior(distribution = "point", point = 0)
+point_prior <- prior(family = "point", point = 0)
 plot(point_prior)
 ```
 
 We can also plot a uniform prior. 
 
 ```{r}
-uniform_prior <- prior(distribution = "uniform", min = 10, max = 20)
+uniform_prior <- prior(family = "uniform", min = 10, max = 20)
 plot(uniform_prior) 
 ```
 
 Or a normal prior.
 
 ```{r}
-normal_prior <- prior(distribution = "normal", mean = 10, sd = 10)
+normal_prior <- prior(family = "normal", mean = 10, sd = 10)
 plot(normal_prior)
 ```
 
 The `plot()` function also behaves sensibly with, for example, half-normal priors. The height of the plot is scaled appropriately, and the plot is only show over the appropriate parameter range. 
 
 ```{r}
-half_normal_prior <- prior(distribution = "normal", mean = 10, sd = 10, range = c(10, Inf))
+half_normal_prior <- prior(family = "normal", mean = 10, sd = 10, range = c(10, Inf))
 plot(half_normal_prior)
 ```
 
