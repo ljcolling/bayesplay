@@ -1,6 +1,5 @@
 context("Plots")
 test_that("Prior plots", {
-  skip("skip")
   # Half normal prior
   half_normal <- prior("normal", 0, 45, range = c(0, Inf))
   half_normal_plot <- plot(half_normal)
@@ -28,8 +27,8 @@ test_that("Prior plots", {
 
 
   # visual comparison discrete
-  prior_model <- prior(distribution = "beta", 10, 10)
-  data_model <- likelihood(distribution = "binomial", 2, 10)
+  prior_model <- prior(family = "beta", 10, 10)
+  data_model <- likelihood(family = "binomial", 2, 10)
   null_prior <- prior("point", 0.5)
 
   m0 <- data_model * null_prior
@@ -39,8 +38,8 @@ test_that("Prior plots", {
 
 
   # visual comparison continuous
-  prior_model <- prior(distribution = "normal", 0, 13.13)
-  data_model <- likelihood(distribution = "normal", 5.5, 32.35)
+  prior_model <- prior(family = "normal", 0, 13.13)
+  data_model <- likelihood(family = "normal", 5.5, 32.35)
   null_prior <- prior("point", 0)
   m0 <- data_model * null_prior
   m1 <- data_model * prior_model
@@ -49,8 +48,8 @@ test_that("Prior plots", {
 
 
   # ratio plot continuous
-  prior_model <- prior(distribution = "normal", 0, 10)
-  data_model <- likelihood(distribution = "normal", 5, 5)
+  prior_model <- prior("normal", 0, 10)
+  data_model <- likelihood("normal", 5, 5)
   null_prior <- prior("point", 0)
   m0 <- data_model * null_prior
   m1 <- data_model * prior_model
@@ -59,8 +58,8 @@ test_that("Prior plots", {
 
   # ratio plot discrete
 
-  prior_model <- prior(distribution = "beta", 10, 10)
-  data_model <- likelihood(distribution = "binomial", 2, 10)
+  prior_model <- prior(family = "beta", 10, 10)
+  data_model <- likelihood(family = "binomial", 2, 10)
   null_prior <- prior("point", 0.5)
 
   m0 <- data_model * null_prior
@@ -69,11 +68,11 @@ test_that("Prior plots", {
   vdiffr::expect_doppelganger("discrete ratio plot", ratio_plot2)
 
   # beta-binom
-  prior_model <- prior(distribution = "beta", 10, 10)
-  data_model <- likelihood(distribution = "binomial", 2, 10)
+  prior_model <- prior(family = "beta", 10, 10)
+  data_model <- likelihood(family = "binomial", 2, 10)
   m1 <- data_model * prior_model
-  prior_posterior1 <- plot(m1, type = "pp")
-  posterior1 <- plot(m1, type = "posterior")
+  prior_posterior1 <- plot(extract_posterior(m1), add_prior = TRUE)
+  posterior1 <- plot(extract_posterior(m1))
   lik <- plot(m1)
   vdiffr::expect_doppelganger("beta-binom pp", prior_posterior1)
   vdiffr::expect_doppelganger("beta-binom posterior", posterior1)
@@ -81,11 +80,11 @@ test_that("Prior plots", {
 
 
   # normal-normal
-  prior_model <- prior(distribution = "normal", 0, 10)
-  data_model <- likelihood(distribution = "normal", 5, 5)
+  prior_model <- prior(family = "normal", 0, 10)
+  data_model <- likelihood(family = "normal", 5, 5)
   m1 <- data_model * prior_model
-  prior_posterior2 <- plot(m1, type = "pp")
-  posterior1 <- plot(m1, type = "posterior")
+  prior_posterior2 <- plot(extract_posterior(m1), add_prior = TRUE)
+  posterior1 <- plot(extract_posterior(m1))
   lik <- plot(m1)
   vdiffr::expect_doppelganger("normal-normal pp", prior_posterior2)
   vdiffr::expect_doppelganger("normal posterior", posterior1)

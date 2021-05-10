@@ -19,6 +19,10 @@ setMethod("plot", "likelihood", function(x) {
   plot.likelihood(x)
 })
 
+setMethod("plot", "product", function(x) {
+  plot.product(x)
+})
+
 
 #' @method plot prior
 #' @rdname plot
@@ -289,7 +293,7 @@ plot_weighted_likelihood <- function(x, n) {
 
   return(ggplot2::ggplot() +
     ggplot2::geom_function(
-      fun = func,
+      fun = Vectorize(func),
       colour = "black",
       na.rm = TRUE,
       n = n
@@ -307,22 +311,23 @@ plot_weighted_likelihood <- function(x, n) {
 plot_posterior <- function(x, n) {
   ggplot2::ggplot() +
     ggplot2::geom_function(
-      fun = x$posterior_function,
+      fun = Vectorize(x$posterior_function),
       n = n
     ) +
     ggplot2::xlim(x@prior_obj@plot$range) +
     ggplot2::labs(x = posterior_labs$x, y = posterior_labs$y) +
+    ggplot2::expand_limits(y = 0) +
     NULL
 }
 
 plot_pp <- function(x, n) {
   ggplot2::ggplot() +
     ggplot2::geom_function(
-      fun = x$posterior_function,
+      fun = Vectorize(x$posterior_function),
       ggplot2::aes(color = "blue")
     ) +
     ggplot2::geom_function(
-      fun = x@prior_obj@func,
+      fun = Vectorize(x@prior_obj@func),
       ggplot2::aes(color = "red")
     ) +
     ggplot2::xlim(x@prior_obj@plot$range) +
@@ -332,6 +337,7 @@ plot_pp <- function(x, n) {
       labels = c("posterior", "prior"),
       name = NULL
     ) +
+    ggplot2::expand_limits(y = 0) +
     # ggplot2::theme_minimal(base_size = 16) +
     NULL
 }
@@ -352,7 +358,7 @@ plot_pp <- function(x, n) {
 #' m1 <- data_model * h1_mod
 #'
 #' # visually compare the model
-#' visual_compare(m0, m01)
+#' visual_compare(m0, m1, type)
 #' @export
 visual_compare <- function(model1, model2, type = "compare") {
   model_name1 <- paste0(substitute(model1))
@@ -379,7 +385,33 @@ visual_compare <- function(model1, model2, type = "compare") {
         model2$prediction_function(x)
     }
 
-    ggplot2::ggplot() +
+  if (model1@likelihood_obj@data$family == "binomial") {
+    df <- data.frame(x = seq(get_max_range(model1)[1],
+                             get_max_range(model1)[2]),
+    y = unlist(lapply(FUN = ratio_function,
+                      seq(get_max_range(model1)[1],
+                          get_max_range(model1)[2], 1))))
+
+    return(ggplot2::ggplot(data = df) +
+      ggplot2::geom_point(ggplot2::aes(x = x, y = y)) +
+      ggplot2::geom_line(ggplot2::aes(x = x, y = y)) +
+      ggplot2::xlim(c(
+        min(
+          get_max_range(model1),
+          get_max_range(model2)
+        ),
+        max(
+          get_max_range(model1),
+          get_max_range(model2)
+        )
+      )) +
+      ggplot2::scale_y_log10() +
+      ggplot2::labs(
+        x = "Outcome",
+        y = paste0("Log 10 BF ", model_name1, " / ", model_name2)
+      ))
+  }
+    return(ggplot2::ggplot() +
       ggplot2::geom_function(fun = ratio_function, n = 101) +
       ggplot2::xlim(c(
         min(
@@ -395,6 +427,6 @@ visual_compare <- function(model1, model2, type = "compare") {
       ggplot2::labs(
         x = "Outcome",
         y = paste0("Log 10 BF ", model_name1, " / ", model_name2)
-      )
+      ))
   }
 }

@@ -26,5 +26,5 @@ m0 <- data_model * h0_mod
 m1 <- data_model * h1_mod
 
 # visually compare the model
-visual_compare(m0, m01)
+visual_compare(m0, m1, type)
 }
