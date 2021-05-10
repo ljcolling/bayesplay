@@ -13,7 +13,7 @@ prior_data_names <- c("family", "parameters", "prior_function")
 
 
 #' Specify a prior
-#'
+#' @description Define priors using different different distribution families
 #' @param family the prior distribution (see details)
 #' @param ... see details
 #'
@@ -57,36 +57,47 @@ prior_data_names <- c("family", "parameters", "prior_function")
 #' # specify a point prior
 #' prior(family = "point", point = 0)
 prior <- function(family, ...) {
-  parameters <- as.list(match.call(expand.dots = TRUE))
-
-
-  # set the default range of support
-  if (parameters$family == "beta") {
-    default_range <- c(0, 1)
-  } else {
-    default_range <- c(-Inf, Inf)
-  }
-
-  range <- parameters$range %||% default_range # nolint
-
-
-
-  # prior function needs parameters for
-  # family - normal, student_t, beta, cauchy, uniform, point
-  # parameters - parameters for the distributions
-  # range_of_support :: for one tailed etc
-
-  family <- paste0(parameters$family %||%
-    "uniform", "_prior")
-
-  lik_fun <- purrr::partial(
-    .f = rlang::as_function(family),
-    range = range, ...
-  )
-
-  return(lik_fun())
+  if (!methods::existsFunction(signature = family, f = "make_prior")) {
+    stop(family, " is not a valid distribution family")
+  } 
+  make_prior(family = new(family), ...)
 }
 
+
+
+# DELETE BELOW HERE
+# # prior <- function(family, ...) {
+# #   parameters <- as.list(match.call(expand.dots = TRUE))
+# # 
+# # 
+# #   # set the default range of support
+# #   if (parameters$family == "beta") {
+# #     default_range <- c(0, 1)
+# #   } else {
+# #     default_range <- c(-Inf, Inf)
+# #   }
+# # 
+# #   range <- parameters$range %||% default_range # nolint
+# # 
+# # 
+# # 
+# #   # prior function needs parameters for
+# #   # family - normal, student_t, beta, cauchy, uniform, point
+# #   # parameters - parameters for the distributions
+# #   # range_of_support :: for one tailed etc
+# # 
+# #   family <- paste0(parameters$family %||%
+# #     "uniform", "_prior")
+# # 
+# #   lik_fun <- purrr::partial(
+# #     .f = rlang::as_function(family),
+# #     range = range, ...
+# #   )
+# # 
+# #   return(lik_fun())
+# # }
+# # 
+# DELETE ABOVE HERE
 
 # function that specifies a normal prior
 # working on for ./R/plotting.R
@@ -403,7 +414,7 @@ beta_prior <- function(alpha, beta, range) {
     "Distribution family: beta\n",
     "Parameters\n",
     "Alpha: ", params$alpha, "\n",
-    "Beta: ", params$alpha
+    "Beta: ", params$beta
   )
 
   data <- list(

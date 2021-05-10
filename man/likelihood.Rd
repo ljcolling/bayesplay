@@ -2,9 +2,27 @@
 % Please edit documentation in R/likelihoods.R
 \name{likelihood}
 \alias{likelihood}
+\alias{make_likelihood.normal}
+\alias{make_likelihood.student_t}
+\alias{make_likelihood.noncentral_d}
+\alias{make_likelihood.noncentral_t}
+\alias{make_likelihood.binomial}
+\alias{make_likelihood.noncentral_d2}
 \title{Specify a likelihood}
 \usage{
 likelihood(family, ...)
+
+likelihood(family = "normal", mean, sd)
+
+likelihood(family = "student_t", mean, sd, df)
+
+likelihood(family = "noncentral_d", d, n)
+
+likelihood(family = "noncentral_t", t, df)
+
+\method{likelihood}{binomial}(family, successes, trials)
+
+likelihood(family = "noncentral_d2", d, n1, n2)
 }
 \arguments{
 \item{family}{the likelihood distribution (see details)}
@@ -15,7 +33,7 @@ likelihood(family, ...)
 an object of class \code{likelihood}
 }
 \description{
-Specify a likelihood
+Define likelihoods using different different distribution families
 }
 \details{
 \subsection{Available distribution families}{

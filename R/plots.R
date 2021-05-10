@@ -1,30 +1,21 @@
-#' somethjing
+#' Plot a bayesplay object
 #' @description Plots an object created by bayesplay
 #' @param x a \code{likelihood}, \code{prior}, \code{posterior}, \code{product} or \code{predictive} object
 setGeneric("plot",
 function(x, ...) standardGeneric("plot"), signature = c("x")
 )
 
-
-
 setMethod("plot", "prior", function(x) {
             plot.prior(x)
 })
 
-setMethod("plot", "posterior", function(x, add_prior) {
+setMethod("plot", "posterior", function(x, add_prior = FALSE) {
             plot.posterior(x, add_prior)
 })
-#' @noRd
-#' @export
-plot.bayesplay <- function(x, ...) {
-  stop("Please use bp_plot to plot bayesplay objects", call. = FALSE)
-}
 
-
-#' Plot a bayesplay object
-#' @description Plots objects created by bayesplay
-#' @export
-bp_plot <- function(x, ...) UseMethod("bp_plot", x)
+setMethod("plot", "likelihood", function(x) {
+            plot.likelihood(x)
+})
 
 
 #' @method plot prior
@@ -34,16 +25,16 @@ plot.prior <- function(x) {
   return(handle_prior_likelihood(x, n = 101)) # TODO: have seperate plot_prior and
 }
 
-#' @method bp_plot likelihood
+#' @method plot likelihood
+#' @rdname plot
 #' @export
-bp_plot.likelihood <- function(x) {
+plot.likelihood <- function(x) {
   return(handle_prior_likelihood(x, n = 101)) # TODO: have seperate plot_prior and
 }
 
-#' plotiting
 #' @method plot posterior
 #' @rdname plot
-#' @param add_prior
+#' @param add_prior set to TRUE to add prior to the posterior plot
 #' @export
 plot.posterior <- function(x, add_prior = FALSE) {
   if (!add_prior) {
@@ -52,23 +43,22 @@ plot.posterior <- function(x, add_prior = FALSE) {
   return(plot_pp(x, n = 101))
 }
 
-#' plotting
+#' @method plot product
+#' @rdname plot
 #' @export
-bp_plot.product <- function(x) {
+plot.product <- function(x) {
   return(plot_weighted_likelihood(x, n = 101))
 }
 
-#' plotting
+#' @method plot prediction
+#' @rdname plot
 #' @export
-bp_plot.prediction <- function(x) {
+plot.prediction <- function(x) {
   model_name <- paste0(substitute(x))
   return(plot_prediction(x, n = 101, model_name))
 }
 
 
-
-# TODO: Split the plots into layers, so that the layes can be joined
-# Also allow plot function to output layer only
 
 plot_prediction <- function(x, n, model_name) {
   likelihood_obj <- x@likelihood_obj
@@ -81,7 +71,6 @@ plot_prediction <- function(x, n, model_name) {
 
   return(handle_other_marginal(x, n, model_name))
 }
-
 
 
 

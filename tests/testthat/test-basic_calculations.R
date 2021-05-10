@@ -228,7 +228,7 @@ test_that("basic BF calculations", {
   )
 
 
-  data_model <- likelihood(family = "binomial", 3, 12)
+  data_model <- likelihood(family = "binomial", 3, trials = 12)
   alt_prior <- prior(family = "beta", 1, 1)
   null_prior <- prior(family = "point", point = 0.5)
   m1 <- data_model * alt_prior
@@ -240,4 +240,20 @@ test_that("basic BF calculations", {
     label = "binomial likelihood, beta uniform",
     tolerance = tol, scale = 1
   )
+
+
+  data_model <- likelihood(family = "binomial", successes = 2, trials = 10)
+  alt_prior <- prior(family = "beta", alpha = 1, beta = 2.5)
+  null_prior <- prior(family = "point", point = 0.5)
+  m1 <- data_model * alt_prior
+  m0 <- data_model * null_prior
+  b1 <- integral(m1) / integral(m0)
+  b2 <- 3.3921325
+  testthat::expect_equal(unclass(b1),
+    unclass(unname(b2)),
+    label = "binomial likelihood, beta prior",
+    tolerance = tol, scale = 1
+  )
+
+
 })

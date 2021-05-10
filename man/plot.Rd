@@ -3,17 +3,28 @@
 \name{plot}
 \alias{plot}
 \alias{plot.prior}
+\alias{plot.likelihood}
 \alias{plot.posterior}
-\title{somethjing}
+\alias{plot.product}
+\alias{plot.prediction}
+\title{Plot a bayesplay object}
 \usage{
 plot(x, ...)
 
 \method{plot}{prior}(x)
 
+\method{plot}{likelihood}(x)
+
 \method{plot}{posterior}(x, add_prior = FALSE)
+
+\method{plot}{product}(x)
+
+\method{plot}{prediction}(x)
 }
 \arguments{
 \item{x}{a \code{likelihood}, \code{prior}, \code{posterior}, \code{product} or \code{predictive} object}
+
+\item{add_prior}{set to TRUE to add prior to the posterior plot}
 }
 \description{
 Plots an object created by bayesplay
