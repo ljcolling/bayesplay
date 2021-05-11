@@ -2,7 +2,6 @@
 #' @description Plots an object created by bayesplay
 #' @param x a \code{likelihood}, \code{prior}, \code{posterior}, \code{product} or \code{predictive} object #nolint
 #' @param ... arguments passed to methods
-# 
 setGeneric("plot",
   function(x, ...) standardGeneric("plot"),
   signature = c("x")
@@ -102,7 +101,7 @@ handle_binomial_marginal <- function(x, n, model_name) {
   ggplot2::ggplot() +
     ggplot2::geom_line(
       data = counterfactual,
-      ggplot2::aes( x= observation, y = auc, colour = model_name)
+      ggplot2::aes(x = observation, y = auc, colour = model_name)
     ) +
     ggplot2::geom_point(
       data = counterfactual,
@@ -274,7 +273,7 @@ plot_weighted_likelihood <- function(x, n) {
     ) +
     ggplot2::labs(
       x = x@prior_obj@plot$labs$x,
-      y = glue::glue("Pr(Outcome) \u00D7 Pr({theta})")
+      y = "Pr(Outcome) \u00D7 Pr(\u03F4)"
     ) +
     ggplot2::xlim(plot_range) +
     NULL)

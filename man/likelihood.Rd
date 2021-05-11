@@ -15,7 +15,7 @@ likelihood(family, ...)
 an object of class \code{likelihood}
 }
 \description{
-Define likelihoods using different different distribution families
+Define likelihoods using different different distribution families #nolint
 }
 \details{
 \subsection{Available distribution families}{
@@ -84,7 +84,7 @@ parameters may be set
 }
 
 \eqn{s_{\mathrm{pooled}}}{s_pooled} is set as below:
-\deqn{s_{\mathrm{pooled}} = \sqrt{\frac{(n_1 - 1)s^2_1 + (n_2 - 1)s^2_2 }{n_1 + n_2 - 2}}}{\sqrt(((n1 - 1) * s1^2 + (n2 - 1)*s2^2)/(n1 + n2 - 2))}
+\deqn{s_{\mathrm{pooled}} = \sqrt{\frac{(n_1 - 1)s^2_1 + (n_2 - 1)s^2_2 }{n_1 + n_2 - 2}}}{\sqrt(((n1 - 1) * s1^2 + (n2 - 1)*s2^2)/(n1 + n2 - 2))} #nolint
 }
 }
 \examples{

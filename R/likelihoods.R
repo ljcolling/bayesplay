@@ -1,5 +1,5 @@
 
-describe_likelihood <- function( x = NULL, 
+describe_likelihood <- function(x = NULL,
                                 params = NULL,
                                 family = NULL,
                                 marginal = FALSE) { # nolint
@@ -118,7 +118,7 @@ likelihood_data_names <- c("family", "parameters", "likelihood_function")
 
 
 #' Specify a likelihood
-#' @description Define likelihoods using different different distribution families
+#' @description Define likelihoods using different different distribution families #nolint
 #' @param family the likelihood distribution (see details)
 #' @param ... see details
 #'
@@ -165,7 +165,7 @@ likelihood_data_names <- c("family", "parameters", "likelihood_function")
 #' * \code{n2} the sample size of group 2
 #'
 #' \eqn{s_{\mathrm{pooled}}}{s_pooled} is set as below:
-#' \deqn{s_{\mathrm{pooled}} = \sqrt{\frac{(n_1 - 1)s^2_1 + (n_2 - 1)s^2_2 }{n_1 + n_2 - 2}}}{\sqrt(((n1 - 1) * s1^2 + (n2 - 1)*s2^2)/(n1 + n2 - 2))}
+#' \deqn{s_{\mathrm{pooled}} = \sqrt{\frac{(n_1 - 1)s^2_1 + (n_2 - 1)s^2_2 }{n_1 + n_2 - 2}}}{\sqrt(((n1 - 1) * s1^2 + (n2 - 1)*s2^2)/(n1 + n2 - 2))} #nolint
 #'
 #'
 #' @md
@@ -276,14 +276,8 @@ make_likelihood.normal <- function(family, mean, sd) { # nolint
 
   params <- list(mean = mean, sd = sd)
 
-  # calculate the plot defaults
   width <- 4 * sd
   range <- c(mean - width, mean + width)
-
-  # func <- make_distribution(
-  #   "norm_dist",
-  #   list(mean = mean, sd = sd)
-  # )
 
 
   func <- function(x) get_function(family)(x = x, mean = mean, sd = sd)
@@ -316,7 +310,7 @@ make_likelihood.normal <- function(family, mean, sd) { # nolint
 #' @usage likelihood(family = "student_t", mean, sd, df)
 #' @param mean the sample mean
 #' @param sd the standard error of the mean
-#' @param df the degrees of freedom 
+#' @param df the degrees of freedom
 #' @noRd
 make_likelihood.student_t <- function(family, mean, sd, df) { #nolint
   if (df == 0) {
@@ -340,11 +334,6 @@ make_likelihood.student_t <- function(family, mean, sd, df) { #nolint
   # calculate the plot defaults
   width <- 4 * sd
   range <- c(mean - width, mean + width)
-  #   func <- make_distribution(
-  #     "t_dist",
-  #     list(df = df, mean = mean, sd = sd)
-  #   )
-  #
 
   func <- function(x) get_function(family)(x = x, mean = mean, sd = sd, df = df)
 
@@ -417,7 +406,7 @@ make_likelihood.noncentral_d <- function(family, d, n) { #nolint
 #' @param t t statistic
 #' @param df degrees of freedom
 #' @noRd
-make_likelihood.noncentral_t <- function(family, t, df) {
+make_likelihood.noncentral_t <- function(family, t, df) { #nolint
   params <- list(t = t, df = df)
 
   d <- t * sqrt(df + 1)
@@ -453,12 +442,14 @@ make_likelihood.noncentral_t <- function(family, t, df) {
 #' @method likelihood binomial
 #' @usage likelihood(family = "binomial", successes, trials)
 #' @noRd
-make_likelihood.binomial <- function(family, successes, trials) {
+make_likelihood.binomial <- function(family, successes, trials) { #nolint
   params <- list(successes = successes, trials = trials)
   # calculate the plot defaults
   range <- c(0, 1)
 
-  func <- function(p) get_function(family)(p = p, successes = successes, trials = trials)
+  func <- function(p) get_function(family)(p = p,
+                                           successes = successes,
+                                           trials = trials) 
 
   data <- make_likelihood_data(family = family, params = params, func = func)
   desc <- describe_likelihood(family = data$family, params = params)
@@ -484,7 +475,7 @@ make_likelihood.binomial <- function(family, successes, trials) {
 #' @method likelihood noncentral_d2
 #' @usage likelihood(family = "noncentral_d2", d, n1, n2)
 #' @noRd
-make_likelihood.noncentral_d2 <- function(family, d, n1, n2) {
+make_likelihood.noncentral_d2 <- function(family, d, n1, n2) { #nolint
   if (n1 == 0 | n2 == 0) {
     stop("You must specify a `n1` and `n2` a non-central t likelihood",
       call. = FALSE

@@ -1,6 +1,9 @@
+is_empty <- function(x) {
+  length(x) == 0
+}
 
 `%||%` <- function(x, y) { # nolint
-  if (purrr::is_empty(x)) y else x
+  if (is_empty(x)) y else x
 }
 
 in_range <- function(x, range) {
@@ -142,13 +145,26 @@ integral <- function(obj) {
   }
 }
 
-#' @importFrom dplyr case_when
-#' @importFrom glue glue
-
 #' @export
 `/.auc` <- function(e1, e2) {
   new("bf", unclass(e1) / unclass(e2))
 }
+
+get_ev_level <- function(x) {
+  if (bf == 1)
+    return("No evidence")
+  if (bf > 1 & bf <= 3)
+    return("Anecdotal evidence")
+  if (bf > 3 & bf <= 10)
+    return("Moderate evidence")
+  if (bf > 10 & bf <= 30)
+    return("Strong evidence")
+  if (bf > 30 & bf <= 100)
+    return("Very strong evidence")
+  if (bf > 100)
+    return("Extreme evidence")
+}
+
 
 bfsay <- function(bf) {
   bf <- unclass(bf)
@@ -159,15 +175,7 @@ bfsay <- function(bf) {
     bf_base <- bf
   }
 
-  ev_level <- dplyr::case_when(
-    bf == 1 ~ "No evidence",
-    bf > 1 & bf <= 3 ~ "Anecdotal evidence",
-    bf > 3 & bf <= 10 ~ "Moderate evidence",
-    bf > 10 & bf <= 30 ~ "Strong evidence",
-    bf > 30 & bf <= 100 ~ "Very strong evidence",
-    bf > 100 ~ "Extreme evidence"
-  )
-
+  ev_level <- get_ev_level(bf)
 
   cat("Using the levels from  Wagenmakers et al (2017)\n")
   cat("A BF of ", round(bf_base, 4), " indicates:\n")
@@ -245,7 +253,7 @@ capitalise <- function(string) {
 
   # split string
   split_string <- strsplit(string, "")[[1]]
-  split_string[1] <- toupper(split_string[1]) 
+  split_string[1] <- toupper(split_string[1])
   paste0(split_string, collapse = "")
 
 

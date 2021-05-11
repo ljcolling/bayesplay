@@ -71,4 +71,3 @@ extract_predictions <- function(x) {
     prior_obj = x@prior_obj
   )
 }
-

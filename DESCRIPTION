@@ -16,14 +16,12 @@ Suggests:
     covr,
     knitr,
     rmarkdown,
+    markdown,
     vdiffr,
     ggplot2
 VignetteBuilder: knitr
 RoxygenNote: 7.1.1
 Imports: 
-    purrr,
     methods,
     rlang,
-    gginnards,
-    glue,
-    dplyr
+    gginnards
