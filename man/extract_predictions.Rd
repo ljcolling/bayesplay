@@ -6,6 +6,12 @@
 \usage{
 extract_predictions(x)
 }
+\arguments{
+\item{x}{a \code{product} object}
+}
+\value{
+a \code{prediction} object
+}
 \description{
-Extract predictions
+Extract the marginal predictions over the prior
 }

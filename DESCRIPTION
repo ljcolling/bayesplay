@@ -24,4 +24,6 @@ Imports:
     purrr,
     methods,
     rlang,
-    gginnards
+    gginnards,
+    glue,
+    dplyr

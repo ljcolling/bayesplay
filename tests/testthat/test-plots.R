@@ -53,7 +53,7 @@ test_that("Prior plots", {
   null_prior <- prior("point", 0)
   m0 <- data_model * null_prior
   m1 <- data_model * prior_model
-  ratio_plot1 <- visual_compare(m0, m1, type = "ratio")
+  ratio_plot1 <- visual_compare(m0, m1, ratio = TRUE)
   vdiffr::expect_doppelganger("continuous ratio plot", ratio_plot1)
 
   # ratio plot discrete
@@ -64,7 +64,7 @@ test_that("Prior plots", {
 
   m0 <- data_model * null_prior
   m1 <- data_model * prior_model
-  ratio_plot2 <- visual_compare(m0, m1, type = "ratio")
+  ratio_plot2 <- visual_compare(m0, m1, ratio = TRUE)
   vdiffr::expect_doppelganger("discrete ratio plot", ratio_plot2)
 
   # beta-binom

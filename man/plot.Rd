@@ -11,19 +11,20 @@
 \usage{
 plot(x, ...)
 
-\method{plot}{prior}(x)
+\method{plot}{prior}(x, ...)
 
-\method{plot}{likelihood}(x)
+\method{plot}{likelihood}(x, ...)
 
-\method{plot}{posterior}(x, add_prior = FALSE)
+\method{plot}{posterior}(x, add_prior = FALSE, ...)
 
-\method{plot}{product}(x)
+\method{plot}{product}(x, ...)
 
-\method{plot}{prediction}(x)
+\method{plot}{prediction}(x, ...)
 }
 \arguments{
-\item{x}{a \code{likelihood}, \code{prior}, \code{posterior}, \code{product}
-or \code{predictive} object}
+\item{x}{a \code{likelihood}, \code{prior}, \code{posterior}, \code{product} or \code{predictive} object #nolint}
+
+\item{...}{arguments passed to methods}
 
 \item{add_prior}{set to TRUE to add prior to the posterior plot}
 }

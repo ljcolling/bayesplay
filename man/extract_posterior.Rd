@@ -2,10 +2,16 @@
 % Please edit documentation in R/extract_functions.R
 \name{extract_posterior}
 \alias{extract_posterior}
-\title{Extract posterior}
+\title{Extract the posterior}
 \usage{
 extract_posterior(x)
 }
+\arguments{
+\item{x}{a \code{product} object}
+}
+\value{
+a \code{posterior} object
+}
 \description{
-Extract posterior
+extract the \code{posterior} object from a \code{product} object
 }

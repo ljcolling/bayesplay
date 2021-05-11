@@ -1,5 +1,3 @@
-#' @noRd
-#' @export
 prior <- setClass(
   Class = "prior",
   slots = list(
@@ -16,8 +14,6 @@ prior <- setClass(
 )
 
 
-#' @noRd
-#' @export
 likelihood <- setClass(
   Class = "likelihood",
   slots = list(
@@ -36,8 +32,6 @@ likelihood <- setClass(
 
 
 
-#' @noRd
-#' @export
 product <- setClass(
   Class = "product",
   slots = list(
@@ -53,8 +47,6 @@ product <- setClass(
 )
 
 
-#' @noRd
-#' @export
 posterior <- setClass(
   Class = "posterior",
   slots = list(
@@ -69,8 +61,6 @@ posterior <- setClass(
   )
 )
 
-#' @noRd
-#' @export
 prediction <- setClass(
   Class = "prediction",
   slots = list(
@@ -94,9 +84,6 @@ setClassUnion("bayesplay", c(
   "prediction"
 ))
 
-#' Summary for an object of class \code{bayesplay}
-#' @noRd
-#' @export
 setMethod(
   "show",
   "bayesplay",
@@ -105,23 +92,23 @@ setMethod(
   }
 )
 
-#' Access values stored in the data slot of an object of class \code{bayesplay}
-#' @usage \\method{$}{bayesplay}(object, ...)
-#' @noRd
-#' @export
+show <- function(x) {
+  UseMethod("show")
+}
+
+#' Get fields from data slot
+#' @param x a \code{bayesplay} object
+#' @param name field name
 setMethod("$",
-  signature = "bayesplay",
+  "bayesplay",
   function(x, name) {
     returnval <- x@data[[name]]
     return(returnval)
   }
 )
 
-
-#' Get names of the data slot of an object of class \code{bayesplay}
-#' @usage \\method{names}{bayesplay}(object, ...)
-#' @noRd
-#' @export
+#' Get names from data slot
+#' @param x a \code{bayesplay} object
 setMethod("names",
   signature = "bayesplay",
   function(x) {
@@ -136,7 +123,6 @@ likelihood_labs <- list(x = theta, y = "Pr(Outcome)")
 
 
 
-#' @export
 setClass(
   Class = "normal",
   list(
@@ -154,7 +140,6 @@ setClass(
 )
 
 
-#' @export
 setClass(
   Class = "point",
   list(
@@ -172,7 +157,6 @@ setClass(
 )
 
 
-#' @export
 setClass(
   Class = "uniform",
   list(
@@ -192,7 +176,6 @@ setClass(
 
 
 
-#' @export
 setClass(
   Class = "student_t",
   list(family = "character", fun = "function", default_range = "numeric"),
@@ -206,7 +189,6 @@ setClass(
 )
 
 
-#' @export
 setClass(
   Class = "cauchy",
   list(family = "character", fun = "function", default_range = "numeric"),
@@ -219,7 +201,6 @@ setClass(
   )
 )
 
-#' @export
 setClass(
   Class = "beta",
   list(family = "character", fun = "function", default_range = "numeric"),
@@ -232,7 +213,6 @@ setClass(
   )
 )
 
-#' @export
 setClass(
   Class = "noncentral_t",
   list(family = "character", fun = "function"),
@@ -245,7 +225,6 @@ setClass(
 )
 
 
-#' @export
 setClass(
   Class = "noncentral_d",
   list(family = "character", fun = "function"),

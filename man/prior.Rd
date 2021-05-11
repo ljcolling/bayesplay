@@ -2,27 +2,9 @@
 % Please edit documentation in R/priors.r
 \name{prior}
 \alias{prior}
-\alias{make_prior.normal}
-\alias{make_prior.point}
-\alias{make_prior.uniform}
-\alias{make_prior.student_t}
-\alias{make_prior.cauchy}
-\alias{make_prior.beta}
 \title{Specify a prior}
 \usage{
 prior(family, ...)
-
-prior(family = "normal", mean, sd, range)
-
-prior(family = "point", point)
-
-prior(family = "uniform", min, max)
-
-prior(family = "student_t", mean, sd, df, range)
-
-prior(family = "cauchy", location, scale, range)
-
-prior(family = "beta", alpha, beta)
 }
 \arguments{
 \item{family}{the prior distribution (see details)}

@@ -135,7 +135,7 @@ truncate_normalise <- function(family, range, ...) {
 
 #' @method prior normal
 #' @usage prior(family = "normal", mean, sd, range)
-#' @rdname prior
+#' @noRd
 make_prior.normal <- function(family, mean, sd, range = NULL) {
   if (missing(mean) | missing(sd)) {
     stop("You must specify `mean` and `sd` for a normal prior", call. = FALSE)
@@ -190,7 +190,7 @@ make_prior.normal <- function(family, mean, sd, range = NULL) {
 
 #' @method prior point
 #' @usage prior(family = "point", point)
-#' @rdname prior
+#' @noRd
 make_prior.point <- function(family, point = 0) {
   if (missing(point)) {
     warning("Point value is missing. Assuming 0", call. = FALSE)
@@ -234,7 +234,7 @@ make_prior.point <- function(family, point = 0) {
 
 #' @method prior uniform
 #' @usage prior(family = "uniform", min, max)
-#' @rdname prior
+#' @noRd
 make_prior.uniform <- function(family, min, max) {
   if (missing(min) | missing(max)) {
     stop("You must specify `min` and `max` for a uniform  prior", call. = FALSE)
@@ -284,7 +284,7 @@ make_prior.uniform <- function(family, min, max) {
 
 #' @method prior student_t
 #' @usage prior(family = "student_t", mean, sd, df, range)
-#' @rdname prior
+#' @noRd
 make_prior.student_t <- function(family, mean, sd, df, range = NULL) {
   if (missing(mean) | missing(sd) | missing(df)) {
     stop("You must specify `mean`, `sd`, and `df` for a student_t prior",
@@ -339,7 +339,7 @@ make_prior.student_t <- function(family, mean, sd, df, range = NULL) {
 
 #' @method prior cauchy
 #' @usage prior(family = "cauchy", location, scale, range)
-#' @rdname prior
+#' @noRd
 make_prior.cauchy <- function(family, location = 0, scale, range = NULL) {
   if (missing(range)) {
     range <- get_default_range(family)
@@ -393,7 +393,7 @@ make_prior.cauchy <- function(family, location = 0, scale, range = NULL) {
 
 #' @method prior beta
 #' @usage prior(family = "beta", alpha, beta)
-#' @rdname prior
+#' @noRd
 make_prior.beta <- function(family, alpha, beta, range = NULL) {
   range <- c(0, 1)
   if (missing(alpha) | missing(beta)) {

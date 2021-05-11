@@ -1,4 +1,82 @@
 
+describe_likelihood <- function( x = NULL, 
+                                params = NULL,
+                                family = NULL,
+                                marginal = FALSE) { # nolint
+
+  if (is.null(params) & is.null(family)) {
+    params <- x$parameters
+    family <- x$family
+  }
+
+  header <- "Object of class likelihood\n"
+  if (marginal) {
+    header <- ""
+  }
+
+
+  if (family == "normal") {
+    return(paste0(
+      header,
+      "Distribution family: normal\n",
+      "Parameters\n",
+      "Mean: ", ifelse(marginal, "X", params$mean), "\n",
+      "SD: ", params$sd
+    ))
+  }
+
+  if (family == "student_t") {
+    return(paste0(
+      header,
+      "Distribution family: student t\n",
+      "Parameters\n",
+      "Mean: ", ifelse(marginal, "X", params$mean), "\n",
+      "SD: ", params$sd, "\n",
+      "DF: ", params$df
+    ))
+  }
+
+  if (family == "noncentral_d") {
+    return(paste0(
+      header,
+      "Distribution family: non-central t (d scaled)\n",
+      "Parameters\n",
+      "d: ", ifelse(marginal, "X", params$d), "\n",
+      "N: ", params$n
+    ))
+  }
+
+  if (family == "noncentral_t") {
+    return(paste0(
+      header,
+      "Distribution family: non-central t (t scaled)\n",
+      "Parameters\n",
+      "d: ", ifelse(marginal, "X", params$t), "\n",
+      "DF: ", params$df
+    ))
+  }
+
+  if (family == "noncentral_d2") {
+    return(paste0(
+      header,
+      "Distribution family: non-central t (independent samples d scaled)\n",
+      "Parameters\n",
+      "d: ", ifelse(marginal, "X", params$d), "\n",
+      "N1: ", params$n1, "\n",
+      "N2: ", params$n2
+    ))
+  }
+
+  if (family == "binomial") {
+    return(paste0(
+      header,
+      "Distribution family: binomial\n",
+      "Parameters\n",
+      "successes: ", ifelse(marginal, "X", params$successes), "\n",
+      "trials: ", params$trials
+    ))
+  }
+}
 get_function <- function(x) x@fun
 get_family <- function(x) x@family
 get_default_range <- function(x) x@default_range
@@ -182,7 +260,9 @@ setMethod(
 
 #' @method likelihood normal
 #' @usage likelihood(family = "normal", mean, sd)
-#' @rdname likelihood
+#' @param mean the sample mean
+#' @param sd the standard error of the mean
+#' @noRd
 make_likelihood.normal <- function(family, mean, sd) { # nolint
   if (missing(mean) | missing(sd)) {
     stop("You must specify a `mean` and `sd` for a normal likelihood",
@@ -234,8 +314,11 @@ make_likelihood.normal <- function(family, mean, sd) { # nolint
 
 #' @method likelihood student_t
 #' @usage likelihood(family = "student_t", mean, sd, df)
-#' @rdname likelihood
-make_likelihood.student_t <- function(family, mean, sd, df) {
+#' @param mean the sample mean
+#' @param sd the standard error of the mean
+#' @param df the degrees of freedom 
+#' @noRd
+make_likelihood.student_t <- function(family, mean, sd, df) { #nolint
   if (df == 0) {
     stop("You must specify a `df` a student_t likelihood",
       call. = FALSE
@@ -289,8 +372,10 @@ make_likelihood.student_t <- function(family, mean, sd, df) {
 
 #' @method likelihood noncentral_d
 #' @usage likelihood(family = "noncentral_d", d, n)
-#' @rdname likelihood
-make_likelihood.noncentral_d <- function(family, d, n) {
+#' @param d Cohen's d for a one sample difference
+#' @param n sample size
+#' @noRd
+make_likelihood.noncentral_d <- function(family, d, n) { #nolint
   if (n == 0) {
     stop("You must specify a `n` a non-central likelihood",
       call. = FALSE
@@ -329,7 +414,9 @@ make_likelihood.noncentral_d <- function(family, d, n) {
 
 #' @method likelihood noncentral_t
 #' @usage likelihood(family = "noncentral_t", t, df)
-#' @rdname likelihood
+#' @param t t statistic
+#' @param df degrees of freedom
+#' @noRd
 make_likelihood.noncentral_t <- function(family, t, df) {
   params <- list(t = t, df = df)
 
@@ -364,8 +451,8 @@ make_likelihood.noncentral_t <- function(family, t, df) {
 
 
 #' @method likelihood binomial
-# #' @usage likelihood(family = "binomial", successes, trials)
-#' @rdname likelihood
+#' @usage likelihood(family = "binomial", successes, trials)
+#' @noRd
 make_likelihood.binomial <- function(family, successes, trials) {
   params <- list(successes = successes, trials = trials)
   # calculate the plot defaults
@@ -396,7 +483,7 @@ make_likelihood.binomial <- function(family, successes, trials) {
 
 #' @method likelihood noncentral_d2
 #' @usage likelihood(family = "noncentral_d2", d, n1, n2)
-#' @rdname likelihood
+#' @noRd
 make_likelihood.noncentral_d2 <- function(family, d, n1, n2) {
   if (n1 == 0 | n2 == 0) {
     stop("You must specify a `n1` and `n2` a non-central t likelihood",

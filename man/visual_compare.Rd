@@ -4,12 +4,14 @@
 \alias{visual_compare}
 \title{Visually compare two models}
 \usage{
-visual_compare(model1, model2, type = "compare")
+visual_compare(model1, model2, ratio = FALSE)
 }
 \arguments{
 \item{model1}{a \code{predictive} object}
 
 \item{model2}{a \code{predictive} object}
+
+\item{ratio}{show ratio rather than comparison (default: FALSE)}
 }
 \value{
 A \code{ggplot2} object
@@ -19,12 +21,14 @@ Visually compare two models
 }
 \examples{
 # define two models
-data_model <- likelihood(distribution = "noncentral_d", d, 79)
-h0_mod <- prior(distribution = "point", point = 0)
-h1_mod <- prior(distribution = "normal", mean = 0, sd = 1)
+data_model <- likelihood(family = "noncentral_d", .8, 79)
+h0_mod <- prior(family = "point", point = 0)
+h1_mod <- prior(family = "normal", mean = 0, sd = 1)
 m0 <- data_model * h0_mod
 m1 <- data_model * h1_mod
 
 # visually compare the model
-visual_compare(m0, m1, type)
+visual_compare(m0, m1)
+# plot the ratio of the two model predictions
+visual_compare(m0, m1, ratio = TRUE)
 }

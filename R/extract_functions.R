@@ -1,5 +1,7 @@
-#' Extract posterior
-#'
+#' Extract the posterior
+#' @description extract the \code{posterior} object from a \code{product} object
+#' @param x a \code{product} object
+#' @return a \code{posterior} object
 #' @export
 extract_posterior <- function(x) {
   if (class(x) != "product") {
@@ -36,6 +38,9 @@ extract_posterior <- function(x) {
 }
 
 #' Extract predictions
+#' @description Extract the marginal predictions over the prior
+#' @param x a \code{product} object
+#' @return a \code{prediction} object
 #' @export
 extract_predictions <- function(x) {
   if (class(x) != "product") {
@@ -67,78 +72,3 @@ extract_predictions <- function(x) {
   )
 }
 
-# functions for describing likelihoods
-describe_likelihood <- function(x = NULL, params = NULL, family = NULL, marginal = FALSE) { # nolint
-  if (is.null(params) & is.null(family)) {
-    params <- x$parameters
-    family <- x$family
-  }
-
-  header <- "Object of class likelihood\n"
-  if (marginal) {
-    header <- ""
-  }
-
-
-  if (family == "normal") {
-    return(paste0(
-      header,
-      "Distribution family: normal\n",
-      "Parameters\n",
-      "Mean: ", ifelse(marginal, "X", params$mean), "\n",
-      "SD: ", params$sd
-    ))
-  }
-
-  if (family == "student_t") {
-    return(paste0(
-      header,
-      "Distribution family: student t\n",
-      "Parameters\n",
-      "Mean: ", ifelse(marginal, "X", params$mean), "\n",
-      "SD: ", params$sd, "\n",
-      "DF: ", params$df
-    ))
-  }
-
-  if (family == "noncentral_d") {
-    return(paste0(
-      header,
-      "Distribution family: non-central t (d scaled)\n",
-      "Parameters\n",
-      "d: ", ifelse(marginal, "X", params$d), "\n",
-      "N: ", params$n
-    ))
-  }
-
-  if (family == "noncentral_t") {
-    return(paste0(
-      header,
-      "Distribution family: non-central t (t scaled)\n",
-      "Parameters\n",
-      "d: ", ifelse(marginal, "X", params$t), "\n",
-      "DF: ", params$df
-    ))
-  }
-
-  if (family == "noncentral_d2") {
-    return(paste0(
-      header,
-      "Distribution family: non-central t (independent samples d scaled)\n",
-      "Parameters\n",
-      "d: ", ifelse(marginal, "X", params$d), "\n",
-      "N1: ", params$n1, "\n",
-      "N2: ", params$n2
-    ))
-  }
-
-  if (family == "binomial") {
-    return(paste0(
-      header,
-      "Distribution family: binomial\n",
-      "Parameters\n",
-      "successes: ", ifelse(marginal, "X", params$successes), "\n",
-      "trials: ", params$trials
-    ))
-  }
-}
