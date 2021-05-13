@@ -84,8 +84,8 @@ in_range <- function(x, range) {
 
   desc <- paste0(
     "Product\n",
-    "  Likelihood family: ", capitalise(likelihood$family), "\n",
-    "  Prior family: ", capitalise(prior$family), "\n",
+    "  Likelihood family: ", likelihood$family, "\n",
+    "  Prior family: ", prior$family, "\n",
     "  Area under curve: ", round(data$integral, 4)
   )
 
@@ -138,11 +138,10 @@ bf <- setClass("bf", contains = "numeric")
 #' # take the integral
 #' integral(model)
 integral <- function(obj) {
-  if (class(obj) == "product") {
-    return(new("auc", obj$integral))
-  } else if (class(obj) == "likelihood") {
-    return(stats::integrate(obj@func, -Inf, Inf)$value)
-  }
+ if (class(obj) != "product")  {
+   stop("obj must be of class product", call. = FALSE)
+ }
+   new("auc", obj$integral)
 }
 
 #' @export
@@ -150,19 +149,25 @@ integral <- function(obj) {
   new("bf", unclass(e1) / unclass(e2))
 }
 
-get_ev_level <- function(x) {
-  if (bf == 1)
+get_ev_level <- function(bf) {
+  if (bf == 1) {
     return("No evidence")
-  if (bf > 1 & bf <= 3)
+  }
+  if (bf > 1 & bf <= 3) {
     return("Anecdotal evidence")
-  if (bf > 3 & bf <= 10)
+  }
+  if (bf > 3 & bf <= 10) {
     return("Moderate evidence")
-  if (bf > 10 & bf <= 30)
+  }
+  if (bf > 10 & bf <= 30) {
     return("Strong evidence")
-  if (bf > 30 & bf <= 100)
+  }
+  if (bf > 30 & bf <= 100) {
     return("Very strong evidence")
-  if (bf > 100)
+  }
+  if (bf > 100) {
     return("Extreme evidence")
+  }
 }
 
 
@@ -243,18 +248,6 @@ integer_breaks <- function(n = 5, ...) {
 #' sd_ratio(model, 0)
 #' @export
 sd_ratio <- function(x, point) {
-  bf <- x@prior_obj$prior_function(point) /
-    x$posterior_function(point)
-
+  bf <- x@prior_obj@func(point) / x$posterior_function(point)
   new("bf", bf)
-}
-
-capitalise <- function(string) {
-
-  # split string
-  split_string <- strsplit(string, "")[[1]]
-  split_string[1] <- toupper(split_string[1])
-  paste0(split_string, collapse = "")
-
-
 }

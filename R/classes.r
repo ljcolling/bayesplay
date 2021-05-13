@@ -99,7 +99,8 @@ show <- function(x) {
 #' Get fields from data slot
 #' @param x a \code{bayesplay} object
 #' @param name field name
-setMethod("$",
+setMethod(
+  "$",
   "bayesplay",
   function(x, name) {
     returnval <- x@data[[name]]

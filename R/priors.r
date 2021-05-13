@@ -1,4 +1,30 @@
 
+make_prior_data <- function(family, params, func) {
+  list(
+     family = get_family(family),
+     parameters = as.data.frame(params),
+     prior_function = func
+  )
+}
+
+describe_prior <- function(family, parameters) {
+  range <- parameters[["range"]]
+  parameters <- parameters[!grepl("range", names(parameters))]
+  range_text <- "\n"
+  if (is.null(range)) {
+    range_text <- paste0("\n    Range: ", range_as_text(range), "\n")
+  }
+
+  parameter_names <- names(parameters)
+  parameter_values <- unname(parameters)
+  return(paste0(
+    "Prior\n",
+    "  Family\n    ", class(family), "\n",
+    "  Parameters\n",
+    paste0("    ", parameter_names, ": ", parameter_values, collapse = "\n"),
+  range_text))
+}
+
 range_as_text <- function(range) {
   paste0(range[1], " to ", range[2])
 }
@@ -65,8 +91,8 @@ prior <- function(family, ...) {
 
 
 setGeneric("make_prior",
+  function(family, ...) standardGeneric("make_prior"),
   signature = "family",
-  function(family, ...) UseMethod("make_prior")
 )
 
 
@@ -83,6 +109,9 @@ setMethod(
   "make_prior",
   signature(family = "point"),
   function(family, point = 0) {
+    if (missing(point)) {
+      warning("Point value is missing. Assuming 0", call. = FALSE)
+    }
     make_prior.point(family, point)
   }
 )
@@ -123,10 +152,15 @@ setMethod(
 )
 
 truncate_normalise <- function(family, range, ...) {
-  unnormalised <- function(x) get_function(family)(x = x, ...)
+  unnormalised <- function(x) get_function(family)(x = x, ...) #nolint
 
-  truncated_function <- function(x) ifelse(in_range(x, range), unnormalised(x), 0)
-  constant <- 1 / integrate(Vectorize(truncated_function), range[1], range[2])$value
+  truncated_function <- function(x) ifelse(in_range(x, range),
+                                           unnormalised(x),
+                                           0)
+
+  constant <- 1 / integrate(Vectorize(truncated_function),
+                            range[1],
+                            range[2])$value
 
   normalised <- function(x) truncated_function(x) * constant
   return(normalised)
@@ -136,7 +170,7 @@ truncate_normalise <- function(family, range, ...) {
 #' @method prior normal
 #' @usage prior(family = "normal", mean, sd, range)
 #' @noRd
-make_prior.normal <- function(family, mean, sd, range = NULL) {
+make_prior.normal <- function(family, mean, sd, range = NULL) { #nolint
   if (missing(mean) | missing(sd)) {
     stop("You must specify `mean` and `sd` for a normal prior", call. = FALSE)
   }
@@ -152,35 +186,24 @@ make_prior.normal <- function(family, mean, sd, range = NULL) {
 
   params <- list(mean = mean, sd = sd, range = range)
 
-  func <- truncate_normalise(family = family, range = range, mean = mean, sd = sd)
+  func <- truncate_normalise(family = family,
+                             range = range,
+                             mean = mean,
+                             sd = sd)
 
-  desc <- paste0(
-    "Object of class prior\n",
-    "Distribution family: normal\n",
-    "Parameters\n",
-    "Mean: ", params$mean, "\n",
-    "SD: ", params$sd, "\n",
-    "Range: ", range_as_text(range)
-  )
-
-  data <- list(
-    family = "normal",
-    parameters = as.data.frame(params),
-    fun = Vectorize(func)
-  )
-
-  names(data) <- prior_data_names
+  desc <- describe_prior(family, params)
+  data <- make_prior_data(family, params, func)
 
   new(
     Class = "prior",
     data = data,
-    theta_range = range,
+    theta_range = params$range,
     type = "normal",
     func = func,
     desc = desc,
     dist_type = "continuous",
     plot = list(
-      range = c(mean - qnorm(p = 0.9999) * sd, mean + qnorm(p = 0.9999) * sd),
+      range = get_plot_range(family)(params),
       labs = list(x = "\u03F4", y = "P(\u03F4)")
     ),
     parameters = list(mean = mean, sd = sd),
@@ -192,27 +215,14 @@ make_prior.normal <- function(family, mean, sd, range = NULL) {
 #' @usage prior(family = "point", point)
 #' @noRd
 make_prior.point <- function(family, point = 0) {
-  if (missing(point)) {
-    warning("Point value is missing. Assuming 0", call. = FALSE)
-  }
   func <- function(x) get_function(family)(x = x, point = point)
   width <- 4
   range <- c(point - width, point + width)
   params <- list(point = point)
   # func <- make_distribution("point", list(point = point)) # nolint
-  desc <- paste0(
-    "Object of class prior\n",
-    "Distribution family: point\n",
-    "Parameters\n",
-    "point: ", params$point
-  )
+  desc <- describe_prior(family, params)
 
-  data <- list(
-    family = "point",
-    params = as.data.frame(params),
-    fun = Vectorize(func)
-  )
-  names(data) <- prior_data_names
+  data <- make_prior_data(family, params, func)
   new(
     Class = "prior",
     data = data,
@@ -221,7 +231,7 @@ make_prior.point <- function(family, point = 0) {
     type = "point",
     dist_type = "point",
     plot = list(
-      range = range,
+      range = get_plot_range(family)(params),
       labs = list(x = "\u03F4", y = "P(\u03F4)")
     ),
     parameters = list(point = point),
@@ -244,21 +254,9 @@ make_prior.uniform <- function(family, min, max) {
   func <- function(x) get_function(family)(x = x, min = min, max = max)
   params <- list(min = min, max = max)
 
-  desc <- paste0(
-    "Object of class prior\n",
-    "Distribution family: uniform\n",
-    "Parameters\n",
-    "Min: ", params$min, "\n",
-    "Max: ", params$max
-  )
+  desc <- describe_prior(family, params)
 
-  data <- list(
-    family = "uniform",
-    params = as.data.frame(params),
-    fun = Vectorize(func)
-  )
-
-  names(data) <- prior_data_names
+  data <- make_prior_data(family, params, func)
 
   new(
     Class = "prior",
@@ -269,7 +267,7 @@ make_prior.uniform <- function(family, min, max) {
     desc = desc,
     dist_type = "continuous",
     plot = list(
-      range = c(min - abs(min - max), max + abs(min - max)),
+      range = get_plot_range(family)(params),
       labs = list(x = "\u03F4", y = "P(\u03F4)")
     ),
     parameters = list(mean = mean, sd = sd),
@@ -300,25 +298,12 @@ make_prior.student_t <- function(family, mean, sd, df, range = NULL) {
 
 
 
-  desc <- paste0(
-    "Object of class prior\n",
-    "Distribution family: student t\n",
-    "Parameters\n",
-    "Mean: ", mean, "\n",
-    "SD: ", sd, "\n",
-    "DF: ", df, "\n",
-    "Range: ", range_as_text(range)
-  )
 
-  params <- list(mean = mean, sd = sd, df = df)
+  params <- list(mean = mean, sd = sd, df = df, range = range)
 
-  data <- list(
-    family = "student t",
-    params = as.data.frame(params),
-    fun = Vectorize(func)
-  )
+  desc <- describe_prior(family, params)
 
-  names(data) <- prior_data_names
+  data <- make_prior_data(family, params, func)
 
   new(
     Class = "prior",
@@ -329,7 +314,7 @@ make_prior.student_t <- function(family, mean, sd, df, range = NULL) {
     desc = desc,
     dist_type = "continuous",
     plot = list(
-      range = c(mean - qnorm(p = 0.9999) * sd, mean + qnorm(p = 0.9999) * sd),
+      range = get_plot_range(family)(params),
       labs = list(x = "\u03F4", y = "P(\u03F4)")
     ),
     parameters = list(mean = mean, sd = sd),
@@ -347,39 +332,24 @@ make_prior.cauchy <- function(family, location = 0, scale, range = NULL) {
 
   func <- truncate_normalise(family = family, range = range, location = location, scale = scale)
 
-  desc <- paste0(
-    "Object of class prior\n",
-    "Distribution family: cauchy\n",
-    "Parameters\n",
-    "Location: ", location, "\n",
-    "Scale: ", scale, "\n",
-    "Range: ", range_as_text(range)
-  )
 
   params <- list(location = location, scale = scale, range = range)
+  desc <- describe_prior(family, params)
 
-  data <- list(
-    family = "cauchy",
-    params = as.data.frame(params),
-    fun = Vectorize(func)
-  )
+  data <- make_prior_data(family, params, func)
 
-  names(data) <- prior_data_names
 
 
   new(
     Class = "prior",
     data = data,
-    theta_range = range,
+    theta_range = params$range,
     func = func,
     type = "normal",
     desc = desc,
     dist_type = "continuous",
     plot = list(
-      range = c(
-        location - qnorm(p = 0.9999) * scale,
-        location + qnorm(p = 0.9999) * scale
-      ),
+      range = get_plot_range(family)(params),
       labs = list(x = "\u03F4", y = "P(\u03F4)")
     ),
     parameters = list(location = location, scale = scale),
@@ -395,7 +365,6 @@ make_prior.cauchy <- function(family, location = 0, scale, range = NULL) {
 #' @usage prior(family = "beta", alpha, beta)
 #' @noRd
 make_prior.beta <- function(family, alpha, beta, range = NULL) {
-  range <- c(0, 1)
   if (missing(alpha) | missing(beta)) {
     stop("You must specify `alpha` and `beta` for a beta  prior", call. = FALSE)
   }
@@ -406,32 +375,22 @@ make_prior.beta <- function(family, alpha, beta, range = NULL) {
 
 
   func <- truncate_normalise(family = family, range = range, beta = beta, alpha = alpha)
-  params <- list(alpha = alpha, beta = beta)
+  params <- list(alpha = alpha, beta = beta, range = range)
 
-  desc <- paste0(
-    "Object of class prior\n",
-    "Distribution family: beta\n",
-    "Parameters\n",
-    "Alpha: ", params$alpha, "\n",
-    "Beta: ", params$beta
-  )
+  desc <- describe_prior(family, params)
 
-  data <- list(
-    family = "Beta",
-    params = as.data.frame(params),
-    fun = Vectorize(func)
-  )
-  names(data) <- prior_data_names
+  data <- make_prior_data(family, params, func)
+
   new(
     Class = "prior",
     data = data,
-    theta_range = range,
+    theta_range = params$range,
     func = func,
     type = "normal",
     desc = desc,
     dist_type = "continuous",
     plot = list(
-      range = c(0, 1),
+      range = get_plot_range(family)(params),
       labs = list(x = "\u03F4", y = "P(\u03F4)")
     ),
     parameters = list(alpha = alpha, beta = beta),

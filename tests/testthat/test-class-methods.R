@@ -1,9 +1,7 @@
 test_that("class methods", {
-  skip("skip")
+
   lik <- likelihood("normal", 0, 1)
   expect_equal(names(lik), c("family", "parameters", "likelihood_function"))
-
-
   pri <- prior("normal", 0, 1)
   expect_equal(names(pri), c("family", "parameters", "prior_function"))
 
@@ -11,30 +9,29 @@ test_that("class methods", {
   expect_equal(
     names(pred),
     c(
-      "integral", "marginal", "posterior_function", "prediction_function",
-      "prior.normalising.constant"
+      "integral",
+      "marginal_function",
+      "evidence_function",
+      "posterior_function",
+      "conditional_function",
+      "weighted_likelihood_function",
+      "prediction_function"
     )
   )
 
   # check show methods
   # normal distribution
-  lik1 <- likelihood("normal", 0, 1)
-  expect_output(show(lik1), "Object of class likelihood\\nDistribution family: normal\\n\\nParameters\\nMean: 0\\nSD: 1 ")
-
-  lik2 <- likelihood("normal", 2, 2)
-  expect_output(show(lik2), "Object of class likelihood\\nDistribution family: normal\\n\\nParameters\\nMean: 2\\nSD: 2 ")
-
-
-  pri1 <- prior("normal", 0, 1)
-  expect_output(show(pri), "Object of class prior\\nDistribution family: normal\\n\\nParameters\nMean: 0\\nSD: 1\\nRange: -Inf to Inf ")
-
-
-  expect_output(show(pred), "Object of class predictive\\nLikelihood family: normal\\nPrior family: normal\\n\\nArea under curve: 0\\.2821 ")
-
-
+  lik <- likelihood("normal", 0, 1)
+  pri <- prior("normal", 0, 1)
   pred1 <- lik * pri
   pred2 <- pri * lik
+
   expect_equal(pred1, pred2)
 
-  expect_equal(integral(lik), 1)
+  pr1 <- prior("cauchy", 0, 1, c(-Inf, Inf))
+  pr2 <- make_prior(new("cauchy"), 0, 1, c(-Inf, Inf))
+  expect_equal(pr1, pr2)
+
+
+
 })

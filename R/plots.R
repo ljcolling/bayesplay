@@ -23,6 +23,9 @@ setMethod("plot", "product", function(x) {
   plot.product(x)
 })
 
+setMethod("plot", "prediction", function(x) {
+  plot.prediction(x)
+})
 
 #' @method plot prior
 #' @rdname plot
@@ -105,16 +108,20 @@ handle_binomial_marginal <- function(x, n, model_name) {
     ) +
     ggplot2::geom_point(
       data = counterfactual,
-      ggplot2::aes(x = observation,
-                   y = auc,
-                   colour = model_name),
+      ggplot2::aes(
+        x = observation,
+        y = auc,
+        colour = model_name
+      ),
       size = 2, shape = 21, fill = "white"
     ) +
     ggplot2::geom_point(
       data = observation_df,
-      ggplot2::aes(x = observation,
-                   y = auc,
-                   colour = model_name),
+      ggplot2::aes(
+        x = observation,
+        y = auc,
+        colour = model_name
+      ),
       size = 2, shape = 16
     ) +
     ggplot2::labs(x = "Outcome", y = "Marginal probability") +
@@ -160,10 +167,11 @@ handle_other_marginal <- function(x, n, model_name) {
   plot_range <- get_max_range(x)
   observation <- x@likelihood_obj@observation
 
+  x <- observation
+  y <- model_func(observation)
+  color <- model_name
   observation_df <- data.frame(
-    x = observation,
-    y = model_func(observation),
-    color = model_name
+    x = x, y = y, color = color
   )
 
 
@@ -174,9 +182,11 @@ handle_other_marginal <- function(x, n, model_name) {
     ) +
     ggplot2::geom_point(
       data = observation_df,
-      ggplot2::aes(x = observation_df$x,
-                   y = observation_df$y,
-                   colour = model_name),
+      ggplot2::aes(
+        x = x,
+        y = y,
+        colour = model_name
+      ),
       size = 2, shape = 16,
     ) +
     ggplot2::labs(x = "Outcome", y = "Marginal probability") +
@@ -197,10 +207,9 @@ handle_other_marginal <- function(x, n, model_name) {
 handle_prior_likelihood <- function(x, n) {
   if (x@dist_type == "point") {
     return(plot_point(x, n))
-  } else if (x@dist_type == "continuous") {
+  }
+  if (x@dist_type == "continuous") {
     return(plot_continuous(x, n))
-  } else if (x@dist_type == "discrete") {
-    return(plot_discrete(x, n))
   }
 }
 
@@ -208,8 +217,10 @@ plot_point <- function(x, n) {
   dens <- 1
   theta <- x@parameters$point
 
-  df <- data.frame(theta = theta,
-                   dens = dens)
+  df <- data.frame(
+    theta = theta,
+    dens = dens
+  )
 
   return(ggplot2::ggplot(
     df,
@@ -242,19 +253,6 @@ plot_continuous <- function(x, n) {
     NULL)
 }
 
-plot_discrete <- function(x, n) {
-  func <- x@func
-  x <- seq(0, x@data$parameters$trials) / x@data$parameters$trials
-  y <- as.numeric(lapply(FUN = func, X = as.numeric(df[, 1])))
-  df <- data.frame(x = x, y = y)
-  return(ggplot2::ggplot(df, ggplot2::aes(x = x, y = y)) +
-    ggplot2::geom_point() +
-    ggplot2::geom_line() +
-    ggplot2::xlim(x@plot$range) +
-    ggplot2::labs(x = x@plot$labs$x, y = x@plot$labs$y) +
-    ggplot2::expand_limits(y = 0) +
-    NULL)
-}
 
 plot_weighted_likelihood <- function(x, n) {
   func <- x$weighted_likelihood_function
@@ -360,33 +358,39 @@ visual_compare <- function(model1, model2, ratio = FALSE) {
         model2$prediction_function(x)
     }
 
-  if (model1@likelihood_obj@data$family == "binomial") {
-    x <- seq(get_max_range(model1)[1],
-                             get_max_range(model1)[2])
-    y <- unlist(lapply(FUN = ratio_function,
-                      seq(get_max_range(model1)[1],
-                          get_max_range(model1)[2], 1)))
-    df <- data.frame(x = x, y = y)
-
-    return(ggplot2::ggplot(data = df) +
-      ggplot2::geom_point(ggplot2::aes(x = x, y = y)) +
-      ggplot2::geom_line(ggplot2::aes(x = x, y = y)) +
-      ggplot2::xlim(c(
-        min(
-          get_max_range(model1),
-          get_max_range(model2)
-        ),
-        max(
-          get_max_range(model1),
-          get_max_range(model2)
+    if (model1@likelihood_obj@data$family == "binomial") {
+      x <- seq(
+        get_max_range(model1)[1],
+        get_max_range(model1)[2]
+      )
+      y <- unlist(lapply(
+        FUN = ratio_function,
+        seq(
+          get_max_range(model1)[1],
+          get_max_range(model1)[2], 1
         )
-      )) +
-      ggplot2::scale_y_log10() +
-      ggplot2::labs(
-        x = "Outcome",
-        y = paste0("Log 10 BF ", model_name1, " / ", model_name2)
       ))
-  }
+      df <- data.frame(x = x, y = y)
+
+      return(ggplot2::ggplot(data = df) +
+        ggplot2::geom_point(ggplot2::aes(x = x, y = y)) +
+        ggplot2::geom_line(ggplot2::aes(x = x, y = y)) +
+        ggplot2::xlim(c(
+          min(
+            get_max_range(model1),
+            get_max_range(model2)
+          ),
+          max(
+            get_max_range(model1),
+            get_max_range(model2)
+          )
+        )) +
+        ggplot2::scale_y_log10() +
+        ggplot2::labs(
+          x = "Outcome",
+          y = paste0("Log 10 BF ", model_name1, " / ", model_name2)
+        ))
+    }
     return(ggplot2::ggplot() +
       ggplot2::geom_function(fun = ratio_function, n = 101) +
       ggplot2::xlim(c(

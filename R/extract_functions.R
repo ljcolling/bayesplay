@@ -9,18 +9,10 @@ extract_posterior <- function(x) {
   }
 
   desc <- paste0(
-    "Object of class posterior\n",
-    "Likelihood:\n",
-    sub(
-      pattern = "Object of class likelihood\nDistribution family: ",
-      x = x@likelihood_obj@desc, replacement = "Family: "
-    ),
-    "\n\nPrior:\n",
-    sub(
-      pattern = "Object of class prior\nDistribution family: ",
-      x = x@prior_obj@desc, replacement = "Family: "
-    ),
-    "\n\nNormalising constant: ", round(x$integral, 4)
+    "Posterior\n",
+    sub(x = sub(pattern = "  Family\n  ",replacement = "",x = x@likelihood_obj@desc), pattern = "\n  Parameters", replacement = ""),
+    sub(x = sub(pattern = "  Family\n  ",replacement = "",x = x@prior_obj@desc), pattern = "\n  Parameters", replacement = ""),
+    "\nNormalising constant: ", round(x$integral, 4)
   )
   x@desc <- desc
 
@@ -48,15 +40,10 @@ extract_predictions <- function(x) {
   }
 
   desc <- paste0(
-    "Object of class marginal prediction\n",
-    "Likelihood:\n",
-    describe_likelihood(x = x@likelihood_obj, marginal = TRUE),
-    "\n\nPrior:\n",
-    sub(
-      pattern = "Object of class prior\nDistribution family: ",
-      x = x@prior_obj@desc, replacement = "Family: "
-    ),
-    "\n\nPrediction range: X = ", range_as_text(get_max_range(x)), "\n",
+    "Marginal prediction\n",
+    sub(x = sub(pattern = "  Family\n  ",replacement = "",x = x@likelihood_obj@desc), pattern = "\n  Parameters", replacement = ""),
+    sub(x = sub(pattern = "  Family\n  ",replacement = "",x = x@prior_obj@desc), pattern = "\n  Parameters", replacement = ""),
+    "\nPrediction range: X = ", range_as_text(get_max_range(x)), "\n",
     "Current observation: X = ", x@likelihood_obj@observation
   )
   new(
