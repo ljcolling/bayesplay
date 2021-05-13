@@ -112,15 +112,16 @@ test_that("Prior plots", {
 
   # prediction plot
   continuous_prediction <- extract_predictions(
-  prior("normal", 0, 10) * likelihood("normal", 2, 10))
+    prior("normal", 0, 10) * likelihood("normal", 2, 10)
+  )
   continuous_prediction_plot <- plot(continuous_prediction)
   continuous_prediction_plot
 
   discrete_prediction <- extract_predictions(
-      prior("beta", 1, 1) * likelihood("binomial", 2, 10))
+    prior("beta", 1, 1) * likelihood("binomial", 2, 10)
+  )
   discrete_prediction_plot <- plot(discrete_prediction)
 
   vdiffr::expect_doppelganger("continuous prediction", continuous_prediction_plot)
   vdiffr::expect_doppelganger("discrete prediction", discrete_prediction_plot)
-
 })

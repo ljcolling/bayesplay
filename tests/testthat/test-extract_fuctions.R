@@ -1,5 +1,4 @@
 test_that("multiplication works", {
-
   l <- likelihood("normal", 0, .1)
   p <- prior("normal", 0, 10)
   prod <- l * p
@@ -17,5 +16,4 @@ test_that("multiplication works", {
     prod,
     "product"
   )
-
 })

@@ -53,12 +53,20 @@ extract_predictions <- function(x) {
 
   desc <- paste0(
     "Marginal prediction\n",
-    sub(x = sub(pattern = "  Family\n  ", replacement = "",
-                x = x@likelihood_obj@desc), pattern = "\n  Parameters",
-        replacement = ""),
-    sub(x = sub(pattern = "  Family\n  ", replacement = "",
-                x = x@prior_obj@desc), pattern = "\n  Parameters",
-        replacement = ""),
+    sub(
+      x = sub(
+        pattern = "  Family\n  ", replacement = "",
+        x = x@likelihood_obj@desc
+      ), pattern = "\n  Parameters",
+      replacement = ""
+    ),
+    sub(
+      x = sub(
+        pattern = "  Family\n  ", replacement = "",
+        x = x@prior_obj@desc
+      ), pattern = "\n  Parameters",
+      replacement = ""
+    ),
     "\nPrediction range: X = ", range_as_text(get_max_range(x)), "\n",
     "Current observation: X = ", x@likelihood_obj@observation
   )

@@ -1,9 +1,9 @@
 
 make_prior_data <- function(family, params, func) {
   list(
-     family = get_family(family),
-     parameters = as.data.frame(params),
-     prior_function = func
+    family = get_family(family),
+    parameters = as.data.frame(params),
+    prior_function = func
   )
 }
 
@@ -22,7 +22,8 @@ describe_prior <- function(family, parameters) {
     "  Family\n    ", class(family), "\n",
     "  Parameters\n",
     paste0("    ", parameter_names, ": ", parameter_values, collapse = "\n"),
-  range_text))
+    range_text
+  ))
 }
 
 range_as_text <- function(range) {
@@ -152,15 +153,20 @@ setMethod(
 )
 
 truncate_normalise <- function(family, range, ...) {
-  unnormalised <- function(x) get_function(family)(x = x, ...) #nolint
+  unnormalised <- function(x) get_function(family)(x = x, ...) # nolint
 
-  truncated_function <- function(x) ifelse(in_range(x, range),
-                                           unnormalised(x),
-                                           0)
+  truncated_function <- function(x) {
+    ifelse(in_range(x, range),
+      unnormalised(x),
+      0
+    )
+  }
 
-  constant <- 1 / integrate(Vectorize(truncated_function),
-                            range[1],
-                            range[2])$value
+  constant <- 1 / integrate(
+    Vectorize(truncated_function),
+    range[1],
+    range[2]
+  )$value
 
   normalised <- function(x) truncated_function(x) * constant
   return(normalised)
@@ -170,7 +176,7 @@ truncate_normalise <- function(family, range, ...) {
 #' @method prior normal
 #' @usage prior(family = "normal", mean, sd, range)
 #' @noRd
-make_prior.normal <- function(family, mean, sd, range = NULL) { #nolint
+make_prior.normal <- function(family, mean, sd, range = NULL) { # nolint
   if (missing(mean) | missing(sd)) {
     stop("You must specify `mean` and `sd` for a normal prior", call. = FALSE)
   }
@@ -186,10 +192,12 @@ make_prior.normal <- function(family, mean, sd, range = NULL) { #nolint
 
   params <- list(mean = mean, sd = sd, range = range)
 
-  func <- truncate_normalise(family = family,
-                             range = range,
-                             mean = mean,
-                             sd = sd)
+  func <- truncate_normalise(
+    family = family,
+    range = range,
+    mean = mean,
+    sd = sd
+  )
 
   desc <- describe_prior(family, params)
   data <- make_prior_data(family, params, func)

@@ -1,5 +1,4 @@
 test_that("class methods", {
-
   lik <- likelihood("normal", 0, 1)
   expect_equal(names(lik), c("family", "parameters", "likelihood_function"))
   pri <- prior("normal", 0, 1)
@@ -31,7 +30,4 @@ test_that("class methods", {
   pr1 <- prior("cauchy", 0, 1, c(-Inf, Inf))
   pr2 <- make_prior(new("cauchy"), 0, 1, c(-Inf, Inf))
   expect_equal(pr1, pr2)
-
-
-
 })

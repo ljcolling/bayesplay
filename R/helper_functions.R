@@ -138,10 +138,10 @@ bf <- setClass("bf", contains = "numeric")
 #' # take the integral
 #' integral(model)
 integral <- function(obj) {
- if (class(obj) != "product")  {
-   stop("obj must be of class product", call. = FALSE)
- }
-   new("auc", obj$integral)
+  if (class(obj) != "product") {
+    stop("obj must be of class product", call. = FALSE)
+  }
+  new("auc", obj$integral)
 }
 
 #' @export

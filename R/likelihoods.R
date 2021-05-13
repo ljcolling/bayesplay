@@ -28,7 +28,7 @@ make_likelihood_data <- function(family, params, func) {
 
 
 dt_scaled <- function(x, df, mean = 0, sd = 1, ncp = 0) {
-    stats::dt((x - mean) / sd, df, ncp = ncp, log = FALSE) / sd
+  stats::dt((x - mean) / sd, df, ncp = ncp, log = FALSE) / sd
 }
 
 d_variance <- function(d, df) {
@@ -40,7 +40,6 @@ d2_variance <- function(d, n1, n2) {
 }
 
 get_plot_range <- function(family) {
-
   w <- 4 # width multipler
 
 
@@ -85,18 +84,19 @@ get_plot_range <- function(family) {
 
   if (class(family) == "point") {
     return(function(params) {
-       location <- params$point
-       width <- w
-       c(location - width, location + width)
+      location <- params$point
+      width <- w
+      c(location - width, location + width)
     })
   }
 
 
   if (class(family) == "uniform") {
     return(function(params) {
-        c(
-          params$min - abs(params$min - params$max),
-          params$max + abs(params$min - params$max))
+      c(
+        params$min - abs(params$min - params$max),
+        params$max + abs(params$min - params$max)
+      )
     })
   }
 
@@ -107,7 +107,6 @@ get_plot_range <- function(family) {
       c(location - width, location + width)
     })
   }
-
 }
 
 
@@ -310,7 +309,7 @@ make_likelihood.normal <- function(family, mean, sd) { # nolint
 #' @noRd
 make_likelihood.student_t <- function(family, mean, sd, df) { # nolint
 
-  if(missing(mean) | missing(sd) | missing(df)) {
+  if (missing(mean) | missing(sd) | missing(df)) {
     stop("You must specify a `mean`, `sd`, and `df` for a student t likelihood",
       call. = FALSE
     )
@@ -446,8 +445,8 @@ make_likelihood.binomial <- function(family, successes, trials) { # nolint
 
   if (missing(trials) | missing(successes)) {
     stop("You must specify `successes` and `trials` for a binomial likelihood",
-    call. = FALSE)
-
+      call. = FALSE
+    )
   }
 
 
