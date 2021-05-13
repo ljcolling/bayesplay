@@ -1,5 +1,10 @@
 context("Likelihoods")
 test_that("specifying likelihoods", {
-
-  expect_equal(2 * 2, 4)
+  tol <- 0.0000005
+  half_norm <- prior(
+    family = "normal",
+    mean = 0,
+    sd = 10,
+    range = c(0, Inf)
+  )
 })

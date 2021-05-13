@@ -8,3 +8,13 @@ lib
 tasks.todo.md
 doc
 Meta
+monitor.rb
+.nvimrc
+Rplots.pdf
+empty.vim
+vignettes/R.sh
+vignettes/RR
+vignettes/Rouder.Rmd
+vignettes/make_vignette
+vignettes/render.sh
+vignettes/advanced.___
