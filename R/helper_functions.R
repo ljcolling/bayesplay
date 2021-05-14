@@ -187,6 +187,11 @@ bfsay <- function(bf) {
   cat(ev_level)
 }
 
+#' Summarise Bayes factor
+#' @description Provide a verbal summary of a Bayes factor and the level of evidence
+#' @param object a \code{bf} object
+#' @export
+#' @describeIn summary
 setMethod(
   "summary",
   "bf",
