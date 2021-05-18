@@ -1,3 +1,6 @@
+# REPO HAS BEEN MOVED
+
+This repository has moved to [https://github.com/bayesplay/bayesplay](https://github.com/bayesplay/bayesplay)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
